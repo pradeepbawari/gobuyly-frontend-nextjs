@@ -143,6 +143,10 @@ export default function Home() {
     // Fetch all products again
     loadInitialData()
   }
+  
+  const handleCategory = () => {
+  
+  }
 
   return (
     <div className="flex min-h-[calc(100vh-140px)]">
@@ -151,7 +155,7 @@ export default function Home() {
           {/* Category Sidebar */}
           <div>
             <CategoryMenu 
-              onSubcategorySelect={handleSubcategorySelect}
+              onSubcategorySelect={handleSubcategorySelect} onCategorySelect={handleCategory}
             />
           </div>
           
