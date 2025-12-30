@@ -80,7 +80,7 @@ export default function Home() {
     }
   }
 
-  const handleSubcategorySelect = async (subcategoryId: string, subcategoryName:string) => {
+  const handleSubcategorySelect = async (subcategoryId: any, subcategoryName:any) => {
     console.log('Subcategory selected:', subcategoryId)
     //setSelectedSubcategory(subcategoryId)
 	setSelectedSubcategory(subcategoryName)

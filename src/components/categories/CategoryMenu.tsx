@@ -6,13 +6,13 @@ import { faListUl, faChevronRight, faCircle } from '@fortawesome/free-solid-svg-
 import { getCategories } from '@/lib/api'
 
 interface CategoryMenuProps {
-  onCategorySelect?: (categoryId: number | null) => void
-  onSubcategorySelect?: (subcategoryId: number) => void
+  onCategorySelect?: (categoryId: any | null) => void
+  onSubcategorySelect?: (subcategoryId: any) => void
 }
 
 export default function CategoryMenu({ onCategorySelect, onSubcategorySelect }: CategoryMenuProps) {
   const [categories, setCategories] = useState([])
-  const [activeCategory, setActiveCategory] = useState<number | null>(null)
+  const [activeCategory, setActiveCategory] = useState<any | null>(null)
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
@@ -30,7 +30,7 @@ export default function CategoryMenu({ onCategorySelect, onSubcategorySelect }: 
     }
   }
 
-  const handleCategoryClick = (categoryId: number) => {
+  const handleCategoryClick = (categoryId: any) => {
     if (activeCategory === categoryId) {
       setActiveCategory(null)
       if (onCategorySelect) onCategorySelect(null)
@@ -40,7 +40,7 @@ export default function CategoryMenu({ onCategorySelect, onSubcategorySelect }: 
     }
   }
 
-  const handleSubcategoryClick = (subcategoryId: number, subcategoryName: string) => {
+  const handleSubcategoryClick = (subcategoryId: any, subcategoryName: any) => {
     console.log(`Subcategory clicked: ${subcategoryName} (ID: ${subcategoryId})`)
     if (onSubcategorySelect) {
       onSubcategorySelect(subcategoryId, subcategoryName)
