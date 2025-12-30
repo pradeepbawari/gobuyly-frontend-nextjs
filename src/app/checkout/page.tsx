@@ -7,8 +7,6 @@ import HeaderPincodeChecker from '@/components/layout/HeaderPincodeChecker'
 
 export default function CheckoutPage() {
   const { cart, total } = useCart()
-  const {status, setStatus} = useState('dfdsfds')
-  const {ft, setFt} = useState('dfdsfds')
   const [formData, setFormData] = useState({
     name: '',
     email: '',
