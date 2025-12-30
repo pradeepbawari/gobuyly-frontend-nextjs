@@ -13,7 +13,7 @@ export default function Home() {
   const [allProducts, setAllProducts] = useState([]) // Store all products
   const [filteredProducts, setFilteredProducts] = useState([]) // Display filtered products
   const [loading, setLoading] = useState(true)
-  const [selectedSubcategory, setSelectedSubcategory] = useState<number | null>(null)
+  const [selectedSubcategory, setSelectedSubcategory] = useState<string | null>(null)
   const [searchFilters, setSearchFilters] = useState({
     searchQuery: '',
     selectedBrand: ''
@@ -80,7 +80,7 @@ export default function Home() {
     }
   }
 
-  const handleSubcategorySelect = async (subcategoryId: number, subcategoryName:string) => {
+  const handleSubcategorySelect = async (subcategoryId: string, subcategoryName:string) => {
     console.log('Subcategory selected:', subcategoryId)
     //setSelectedSubcategory(subcategoryId)
 	setSelectedSubcategory(subcategoryName)
