@@ -195,7 +195,7 @@ export default function ProductCard({ product = {} }: ProductCardProps) {
             {product?.product_name} {product?.title?.size} {product?.title?.materials} {product?.title?.color_id !== 'No Colour' ? product?.title?.color_id : ''}
           </span>
 		  </h4>
-<span className="text-xs font-medium bg-gray-100 text-gray-600 px-2 py-1.5 h-7 rounded uppercase">{product?.title?.company_id}</span>
+ {product?.title?.company_id && <span className="text-xs font-medium text-gray-600 px-2 py-1.5 h-7 rounded uppercase bg-gray-100">{product?.title?.company_id}</span>}
 </div>
           <p className="text-gray-500 text-[13px] mb-2 line-clamp-2">
             {product.description || 'Premium product'}

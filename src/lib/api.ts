@@ -1,5 +1,5 @@
-//const API_URL = 'http://localhost:4000';
-const API_URL = 'https://api.gobuyly.com';
+const API_URL = 'http://localhost:4000';
+// const API_URL = 'https://api.gobuyly.com';
 
 // Fetch all categories
 export async function getCategories(): Promise<any> {
