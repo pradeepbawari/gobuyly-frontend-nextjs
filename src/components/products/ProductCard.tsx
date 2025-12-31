@@ -192,7 +192,7 @@ export default function ProductCard({ product = {} }: ProductCardProps) {
 		<div className="flex justify-between gap-3">
         <h4 className="font-semibold text-gray-800 text-lg">
           <span>
-            {product?.company_id} {product?.product_name} {product?.title?.size} {product?.title?.materials} {product?.title?.color_id !== 'No Colour' ? product?.title?.color_id : ''}
+            {product?.title?.company_id} {product?.product_name} {product?.title?.size} {product?.title?.materials} {product?.title?.color_id !== 'No Colour' ? product?.title?.color_id : ''}
           </span>
 		  </h4>
  {product?.title?.company_id && <span className="text-xs font-medium text-gray-600 px-2 py-1.5 h-7 rounded uppercase bg-gray-100">{product?.title?.company_id}</span>}
