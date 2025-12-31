@@ -1,7 +1,7 @@
 // components/HeaderPincodeChecker.tsx
 'use client'
 
-import { useState } from 'react'
+import { ChangeEvent, useState } from 'react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faMapMarkerAlt, faCheck, faTimes, faTruck } from '@fortawesome/free-solid-svg-icons'
 
@@ -54,7 +54,7 @@ export default function HeaderPincodeChecker() {
     localStorage.removeItem('userPincode')	
   }
   
-  const statusHandler = (e) => {
+  const statusHandler = (e: ChangeEvent<HTMLInputElement>) => {
 	  setPincode(e.target.value.replace(/\D/g, '').slice(0, 6))
   }
 
