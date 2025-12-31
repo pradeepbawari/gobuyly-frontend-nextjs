@@ -8,10 +8,28 @@ import { getCategories, getProducts, transformProduct } from '@/lib/api'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faCutlery } from '@fortawesome/free-solid-svg-icons'
 
+interface Product {
+  id: number
+  name: string
+  sku?: string
+  description?: string
+  brand?: string
+  // add other product properties as needed
+}
+
+interface Category {
+  id: number
+  name: string
+  subcategories?: Array<{
+    id: number
+    name: string
+  }>
+}
+
 export default function Home() {
-  const [categories, setCategories] = useState([])
-  const [allProducts, setAllProducts] = useState([]) // Store all products
-  const [filteredProducts, setFilteredProducts] = useState([]) // Display filtered products
+  const [categories, setCategories] = useState<Category[]>([])
+  const [allProducts, setAllProducts] = useState<Product[]>([])
+  const [filteredProducts, setFilteredProducts] = useState<Product[]>([])
   const [loading, setLoading] = useState(true)
   const [selectedSubcategory, setSelectedSubcategory] = useState<string | null>(null)
   const [searchFilters, setSearchFilters] = useState({
@@ -29,7 +47,7 @@ export default function Home() {
   useEffect(() => {
     const timer = setTimeout(() => {
       setDebouncedSearch(searchFilters.searchQuery)
-    }, 500) // 500ms delay
+    }, 500)
 
     return () => clearTimeout(timer)
   }, [searchFilters.searchQuery])
@@ -46,7 +64,7 @@ export default function Home() {
       setLoading(true)
       const [categoriesData, productsData] = await Promise.all([
         getCategories(),
-        getProducts() // Fetch all products initially
+        getProducts()
       ])
       
       setCategories(categoriesData?.categories || [])
@@ -64,7 +82,6 @@ export default function Home() {
     console.log('Search filters changed:', filters)
     setSearchFilters(filters)
     
-    // If both filters are empty, fetch all products from API
     if (!filters.searchQuery && !filters.selectedBrand) {
       try {
         setLoading(true)
@@ -72,6 +89,7 @@ export default function Home() {
         const products = productsData?.variants?.rows?.map(transformProduct) || []
         setAllProducts(products)
         setFilteredProducts(products)
+        setSelectedSubcategory(null) // Clear subcategory when searching
       } catch (error) {
         console.error('Failed to fetch products:', error)
       } finally {
@@ -80,16 +98,15 @@ export default function Home() {
     }
   }
 
-  const handleSubcategorySelect = async (subcategoryId: any, subcategoryName:any) => {
-    console.log('Subcategory selected:', subcategoryId)
-    //setSelectedSubcategory(subcategoryId)
-	setSelectedSubcategory(subcategoryName)
+  const handleSubcategorySelect = async (subcategoryId: number, subcategoryName: string) => {
+    console.log('Subcategory selected:', subcategoryName, 'ID:', subcategoryId)
+    setSelectedSubcategory(subcategoryName)
     
     try {
       setLoading(true)
       // Fetch products for this subcategory
       const productsData = await getProducts({
-        id: subcategoryId // Adjust based on your API
+        subcategoryId: subcategoryId
       })
       
       const products = productsData?.variants?.rows?.map(transformProduct) || []
@@ -109,7 +126,7 @@ export default function Home() {
     }
   }
 
-  const applyFilters = () => {
+  const applyFilters = useCallback(() => {
     let filtered = [...allProducts]
 
     // Apply search query filter
@@ -132,7 +149,7 @@ export default function Home() {
 
     console.log(`Filtered ${allProducts.length} products to ${filtered.length} products`)
     setFilteredProducts(filtered)
-  }
+  }, [allProducts, debouncedSearch, searchFilters.selectedBrand])
 
   const handleClearAllFilters = () => {
     setSelectedSubcategory(null)
@@ -140,12 +157,7 @@ export default function Home() {
       searchQuery: '',
       selectedBrand: ''
     })
-    // Fetch all products again
     loadInitialData()
-  }
-  
-  const handleCategory = () => {
-  
   }
 
   return (
@@ -155,7 +167,7 @@ export default function Home() {
           {/* Category Sidebar */}
           <div>
             <CategoryMenu 
-              onSubcategorySelect={handleSubcategorySelect} onCategorySelect={handleCategory}
+              onSubcategorySelect={handleSubcategorySelect}
             />
           </div>
           

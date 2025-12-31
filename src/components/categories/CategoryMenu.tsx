@@ -6,13 +6,24 @@ import { faListUl, faChevronRight, faCircle } from '@fortawesome/free-solid-svg-
 import { getCategories } from '@/lib/api'
 
 interface CategoryMenuProps {
-  onCategorySelect?: (categoryId: any | null) => void
-  onSubcategorySelect?: (subcategoryId: any) => void
+  onCategorySelect?: (categoryId: number | null) => void
+  onSubcategorySelect?: (subcategoryId: number, subcategoryName: string) => void
+}
+
+interface Category {
+  id: number
+  name: string
+  subcategories?: Subcategory[]
+}
+
+interface Subcategory {
+  id: number
+  name: string
 }
 
 export default function CategoryMenu({ onCategorySelect, onSubcategorySelect }: CategoryMenuProps) {
-  const [categories, setCategories] = useState([])
-  const [activeCategory, setActiveCategory] = useState<any | null>(null)
+  const [categories, setCategories] = useState<Category[]>([])
+  const [activeCategory, setActiveCategory] = useState<number | null>(null)
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
@@ -30,7 +41,7 @@ export default function CategoryMenu({ onCategorySelect, onSubcategorySelect }: 
     }
   }
 
-  const handleCategoryClick = (categoryId: any) => {
+  const handleCategoryClick = (categoryId: number) => {
     if (activeCategory === categoryId) {
       setActiveCategory(null)
       if (onCategorySelect) onCategorySelect(null)
@@ -40,7 +51,7 @@ export default function CategoryMenu({ onCategorySelect, onSubcategorySelect }: 
     }
   }
 
-  const handleSubcategoryClick = (subcategoryId: any, subcategoryName: any) => {
+  const handleSubcategoryClick = (subcategoryId: number, subcategoryName: string) => {
     console.log(`Subcategory clicked: ${subcategoryName} (ID: ${subcategoryId})`)
     if (onSubcategorySelect) {
       onSubcategorySelect(subcategoryId, subcategoryName)
@@ -66,7 +77,7 @@ export default function CategoryMenu({ onCategorySelect, onSubcategorySelect }: 
       </h3>
 
       <div className="space-y-1">
-        {categories.map((category: any) => (
+        {categories.map((category) => (
           <div key={category.id} className="rounded-lg overflow-hidden">
             <div
               onClick={() => handleCategoryClick(category.id)}
@@ -93,7 +104,7 @@ export default function CategoryMenu({ onCategorySelect, onSubcategorySelect }: 
                 }`}
               >
                 <div className="ml-8 pl-1 border-l-2 border-emerald-100">
-                  {category.subcategories.map((child: any) => (
+                  {category.subcategories.map((child) => (
                     <div
                       key={child.id}
                       onClick={() => handleSubcategoryClick(child.id, child.name)}
