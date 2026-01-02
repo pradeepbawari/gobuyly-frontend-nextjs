@@ -7,6 +7,9 @@ interface User {
   name: string
   email: string
   avatar?: string
+  address?: string
+  mobile_number?:number
+  gst?:any
 }
 
 interface AuthContextType {
