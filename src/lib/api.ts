@@ -1,5 +1,5 @@
-// const API_URL = 'http://localhost:4000';
-const API_URL = 'https://api.gobuyly.com';
+const API_URL = 'http://localhost:4000';
+// const API_URL = 'https://api.gobuyly.com';
 
 // Fetch all categories
 export async function getCategories(): Promise<any> {
@@ -274,24 +274,50 @@ export async function getProductsWithPagination(limit: number = 50, offset: numb
   }
 }
 
-export async function userRegister(form:any) {
+export async function userRegister(form: any) {
   try {
-    
-    const response = await fetch(`${API_URL}/api/products_user/filterProductsNew1`, {
+    const response = await fetch(`${API_URL}/api/users/create`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify(form)
+      body: JSON.stringify(form),
     });
-    
+
+    const data = await response.json(); // ✅ ALWAYS parse JSON
+
     if (!response.ok) {
-      throw new Error(`Failed to fetch products: ${response.status}`);
+      // ✅ send backend error to frontend
+      return { error: data.error };
     }
-    
-    return await response.json();
-  } catch (error) {
-    console.error('Error fetching products with pagination:', error);
-    return { variants: { rows: [], totalCount: 0 } };
+
+    return data;
+  } catch (error: any) {
+    console.error('Register error:', error.message);
+    return { error: 'Something went wrong' };
+  }
+}
+
+export async function loginUser(form: any) {
+  try {
+    const response = await fetch(`${API_URL}/api/users/login`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(form),
+    });
+
+    const data = await response.json(); // ✅ ALWAYS parse JSON
+
+    if (!response.ok) {
+      // ✅ send backend error to frontend
+      return { error: data.error };
+    }
+
+    return data;
+  } catch (error: any) {
+    console.error('Register error:', error.message);
+    return { error: 'Something went wrong' };
   }
 }

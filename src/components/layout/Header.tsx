@@ -1,15 +1,17 @@
 'use client'
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faShoppingCart, faHeart, faSignInAlt, faHome, faShoppingBag, faBox, faHeadset } from '@fortawesome/free-solid-svg-icons'
+import { faShoppingCart, faHeart, faSignInAlt, faHome, faShoppingBag, faBox, faHeadset, faSignOutAlt, faUserAlt } from '@fortawesome/free-solid-svg-icons'
 import Link from 'next/link'
 import { useCart } from '@/context/CartContext' // ADD THIS IMPORT
 import Image from 'next/image'
 import Logo from '../../../public/gobuyly.png'
 import HeaderPincodeChecker from './HeaderPincodeChecker'
+import { useAuth } from '@/context/AuthContext.'
 
 export default function Header() {
   const { itemCount } = useCart() // GET CART COUNT FROM CONTEXT
+  const { user, isAuthenticated, logout } = useAuth()
 
   return (
     <header className="w-full bg-white shadow-sm px-6 py-4 flex items-center justify-between sticky top-0 z-50">
@@ -39,6 +41,18 @@ export default function Header() {
 
       <div className="flex items-center gap-5">
         
+        <nav className="flex gap-4 items-center">
+        {!isAuthenticated ? (
+          <>
+            <Link href="/login" className="bg-gradient-to-r from-emerald-500 to-teal-500 text-white px-5 py-2 rounded-lg font-medium hover:shadow-lg transition-all hover:scale-[1.02]">Login <FontAwesomeIcon icon={faSignInAlt} className="mr-2" /></Link>
+          </>
+        ) : (
+          <div className="flex gap-2 items-center">
+            <span className='capitalize text-gray-400'>{user?.name}</span>
+            <button onClick={logout} className="rounded-lg">Logout <FontAwesomeIcon icon={faSignOutAlt} className="mr-2" /></button>
+            <Link href="/profile" className="rounded-lg">Profile <FontAwesomeIcon icon={faUserAlt} className="mr-2" /></Link>
+          </div>
+        )}
         <Link href="/cart" className="relative text-gray-700 hover:text-emerald-600 transition-colors">
           <FontAwesomeIcon icon={faShoppingCart} className="text-xl" />
           {itemCount > 0 && ( // USE itemCount FROM CONTEXT
@@ -47,12 +61,7 @@ export default function Header() {
             </span>
           )}
         </Link>
-        
-        <div className="h-6 w-px bg-gray-200"></div>
-        
-        <button className="bg-gradient-to-r from-emerald-500 to-teal-500 text-white px-5 py-2 rounded-lg font-medium hover:shadow-lg transition-all hover:scale-[1.02]">
-          <FontAwesomeIcon icon={faSignInAlt} className="mr-2" />Sign In
-        </button>
+      </nav>
       </div>
     </header>
   )
