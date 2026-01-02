@@ -1,5 +1,5 @@
-//const API_URL = 'http://localhost:4000';
-const API_URL = 'https://api.gobuyly.com';
+const API_URL = 'http://localhost:4000';
+// const API_URL = 'https://api.gobuyly.com';
 
 // Fetch all categories
 export async function getCategories(): Promise<any> {
@@ -20,15 +20,52 @@ export async function getProducts(filters: any = {}) {
     console.log('📡 Fetching products with filters:', filters)
     
     const payload = {
-      limit: "50",
+      limit: 20,
       offset: 0,
-      orderBy: [{ sort: "ASC", colId: "company" }],
+      orderBy: [{ sort: "ASC", colId: "price" }],
       filters: filters
     }
     
     console.log('📦 API Payload:', JSON.stringify(payload, null, 2))
     
     const response = await fetch(`${API_URL}/api/products_user/filterProductsNew`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(payload)
+    })
+    
+    console.log('📊 Response status:', response.status)
+    
+    if (!response.ok) {
+      throw new Error(`Failed to fetch products: ${response.status}`)
+    }
+    
+    const data = await response.json()
+    console.log('✅ Products data received, count:', data.variants?.rows?.length || 0)
+    
+    return data
+  } catch (error) {
+    console.error('❌ Error fetching products:', error)
+    // Return empty structure instead of throwing
+    return { variants: { rows: [] } }
+  }
+}
+export async function getsearchProducts(filters: any = {}) {
+  try {
+    console.log('📡 Fetching products with filters:', filters)
+    
+    const payload = {
+      limit: 20,
+      offset: 0,
+      orderBy: [{ sort: "ASC", colId: "price" }],
+      filters: filters
+    }
+    
+    console.log('📦 API Payload:', JSON.stringify(payload, null, 2))
+    
+    const response = await fetch(`${API_URL}/api/products_user/searchProducts`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -224,6 +261,28 @@ export async function getProductsWithPagination(limit: number = 50, offset: numb
         'Content-Type': 'application/json',
       },
       body: JSON.stringify(payload)
+    });
+    
+    if (!response.ok) {
+      throw new Error(`Failed to fetch products: ${response.status}`);
+    }
+    
+    return await response.json();
+  } catch (error) {
+    console.error('Error fetching products with pagination:', error);
+    return { variants: { rows: [], totalCount: 0 } };
+  }
+}
+
+export async function userRegister(form:any) {
+  try {
+    
+    const response = await fetch(`${API_URL}/api/products_user/filterProductsNew1`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(form)
     });
     
     if (!response.ok) {

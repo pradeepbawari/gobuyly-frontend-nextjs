@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from 'react'
 import CategoryMenu from '@/components/categories/CategoryMenu'
 import ProductGrid from '@/components/products/ProductGrid'
 import SearchFilter from '@/components/ui/SearchFilter'
-import { getCategories, getProducts, transformProduct } from '@/lib/api'
+import { getCategories, getProducts, getsearchProducts, transformProduct } from '@/lib/api'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faCutlery } from '@fortawesome/free-solid-svg-icons'
 
@@ -82,10 +82,13 @@ export default function Home() {
     console.log('Search filters changed:', filters)
     setSearchFilters(filters)
     
-    if (!filters.searchQuery && !filters.selectedBrand) {
+    if (filters.searchQuery || filters.selectedBrand) {
       try {
         setLoading(true)
-        const productsData = await getProducts()
+        const productsData = await getsearchProducts({
+          searchTerm: filters.searchQuery,
+          searchBrandTerm: filters.selectedBrand
+        })
         const products = productsData?.variants?.rows?.map(transformProduct) || []
         setAllProducts(products)
         setFilteredProducts(products)
@@ -106,7 +109,8 @@ export default function Home() {
       setLoading(true)
       // Fetch products for this subcategory
       const productsData = await getProducts({
-        subcategoryId: subcategoryId
+        subcategory_id: subcategoryId,
+        // category_id:24
       })
       
       const products = productsData?.variants?.rows?.map(transformProduct) || []
@@ -149,6 +153,7 @@ export default function Home() {
 
     console.log(`Filtered ${allProducts.length} products to ${filtered.length} products`)
     setFilteredProducts(filtered)
+    setFilteredProducts(allProducts)
   }, [allProducts, debouncedSearch, searchFilters.selectedBrand])
 
   const handleClearAllFilters = () => {

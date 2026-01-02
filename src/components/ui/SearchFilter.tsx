@@ -10,39 +10,58 @@ interface SearchFilterProps {
   initialSearch?: string
 }
 
+interface Brand {
+  id: string
+  name: string
+}
+
 export default function SearchFilter({ 
   onSearch, 
   initialBrand = '', 
   initialSearch = '' 
 }: SearchFilterProps) {
-  const [searchQuery, setSearchQuery] = useState(initialSearch)
-  const [selectedBrand, setSelectedBrand] = useState(initialBrand)
-  const [brands, setBrands] = useState<string[]>([])
+  const defaultBrands: Brand[] = [
+  { id: '', name: 'All Brands' },
+  { id: '12', name: 'KWS' },
+  { id: '11', name: 'Prestige' },
+  { id: '3', name: 'Pigeon' },
+  { id: '4', name: 'Milton' },
+  { id: '5', name: 'Nirlon' },
+]
+const [searchQuery, setSearchQuery] = useState(initialSearch)
+const [selectedBrand, setSelectedBrand] = useState<string>(initialBrand)
+const [brands, setBrands] = useState<Brand[]>([])
 
   // Load brands from API or use default
   useEffect(() => {
-    // You can fetch brands from an API here
-    const defaultBrands = ['All Brands', 'KMW', 'Prestige', 'Pigeon', 'Milton', 'Nirlon']
     setBrands(defaultBrands)
   }, [])
 
   const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault()
-    console.log('Searching with:', { searchQuery, selectedBrand })
-    onSearch({ searchQuery, selectedBrand })
-  }
+  e.preventDefault()
+  onSearch({
+    searchQuery,
+    selectedBrand, // ← brand ID
+  })
+}
 
-  const handleBrandChange = (brand: string) => {
-    setSelectedBrand(brand)
-    // Trigger search immediately when brand changes
-    onSearch({ searchQuery, selectedBrand: brand })
-  }
+const handleBrandChange = (brandId: string) => {
+  setSelectedBrand(brandId)
+  onSearch({
+    searchQuery,
+    selectedBrand: brandId,
+  })
+}
 
-  const handleClearFilters = () => {
-    setSearchQuery('')
-    setSelectedBrand('All Brands')
-    onSearch({ searchQuery: '', selectedBrand: 'All Brands' })
-  }
+const handleClearFilters = () => {
+  setSearchQuery('')
+  setSelectedBrand('')
+  onSearch({
+    searchQuery: '',
+    selectedBrand: '',
+  })
+}
+
 
   return (
     <div className="bg-white rounded-2xl shadow-sm p-5 mb-6 border border-gray-100">
@@ -52,16 +71,17 @@ export default function SearchFilter({
           <label className="block text-sm font-medium text-gray-700 mb-1">Filter by Brand</label>
           <div className="relative border-1 rounded-lg border-gray-300">
             <select
-              value={selectedBrand}
-              onChange={(e) => handleBrandChange(e.target.value)}
-              className="w-full md:w-48 border-gray-300 rounded-xl pl-4 pr-10 py-3 text-sm focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 appearance-none bg-white"
-            >
-              {brands.map((brand) => (
-                <option key={brand} value={brand === 'All Brands' ? '' : brand}>
-                  {brand}
-                </option>
-              ))}
-            </select>
+  value={selectedBrand}
+  onChange={(e) => handleBrandChange(e.target.value)}
+  className="w-full md:w-48 border-gray-300 rounded-xl pl-4 pr-10 py-3 text-sm focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 appearance-none bg-white"
+>
+  {brands.map((brand) => (
+    <option key={brand.id} value={brand.id}>
+      {brand.name}
+    </option>
+  ))}
+</select>
+
             <div className="absolute right-3 top-2 text-gray-400 pointer-events-none">
               <FontAwesomeIcon icon={faChevronDown} className="text-sm" />
             </div>
