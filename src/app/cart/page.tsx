@@ -55,7 +55,7 @@ export default function CartPage() {
     user ? setAddressChange(!addressChange) : router.push('/login')
   }
 
-  const updateHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const updateHandler = (e:any) => {
     setForm({ ...form, [e.target.name]: e.target.value });
     console.log(form)
   }
