@@ -5,9 +5,30 @@ import Link from 'next/link'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faTrash, faArrowLeft, faShoppingBag } from '@fortawesome/free-solid-svg-icons'
 import Image from 'next/image'
+import { useAuth } from '@/context/AuthContext.'
+import { useRouter } from 'next/navigation'
+import { useState } from 'react'
 
 export default function CartPage() {
   const { cart, total, removeFromCart, updateQuantity, clearCart } = useCart()
+  const { user } = useAuth();
+  const router = useRouter();
+  const [addressChange, setAddressChange] = useState(false)
+  const [loading, setLoading] = useState(false)
+  const [form, setForm] = useState({
+    name: '',
+    email: '',
+    password: '',
+    mobile_number: '',
+    address: '',
+    gstin: '',
+    pincode: '',
+  });
+  const [error, setError] = useState('');
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setForm({ ...form, [e.target.name]: e.target.value });
+  };
 
   if (cart.length === 0) {
     return (
@@ -28,6 +49,15 @@ export default function CartPage() {
         </div>
       </div>
     )
+  }
+
+  const addressHandler = () => {
+    user ? setAddressChange(!addressChange) : router.push('/login')
+  }
+
+  const updateHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setForm({ ...form, [e.target.name]: e.target.value });
+    console.log(form)
   }
 
   return (
@@ -80,30 +110,57 @@ export default function CartPage() {
 
                   {/* Quantity Controls */}
                   <div className="flex items-center gap-3">
-                    <div className="flex items-center gap-2">
-                      <button
-                        onClick={() => updateQuantity(item.product.id, item.quantity - 1)}
-                        className="w-8 h-8 rounded-lg border border-gray-300 flex items-center justify-center hover:bg-gray-50"
-                      >
-                        -
-                      </button>
-                      <span className="w-12 text-center font-semibold">{item.quantity}</span>
-                      <button
-                        onClick={() => updateQuantity(item.product.id, item.quantity + 1)}
-                        className="w-8 h-8 rounded-lg border border-gray-300 flex items-center justify-center hover:bg-gray-50"
-                      >
-                        +
-                      </button>
-                    </div>
+  <div className="flex items-center gap-2">
 
-                    {/* Remove Button */}
-                    <button
-                      onClick={() => removeFromCart(item.product.id)}
-                      className="text-red-500 hover:text-red-700 p-2"
-                    >
-                      <FontAwesomeIcon icon={faTrash} />
-                    </button>
-                  </div>
+    {/* DECREASE */}
+    <button
+      onClick={() =>
+        updateQuantity(
+          item.product.id,
+          Math.max(1, item.quantity - 1)
+        )
+      }
+      disabled={item.quantity === 1}
+      className="w-8 h-8 rounded-lg border border-gray-300 bg-white
+                 flex items-center justify-center
+                 disabled:opacity-50 disabled:cursor-not-allowed
+                 hover:bg-gray-50"
+    >
+      -
+    </button>
+
+    {/* QUANTITY */}
+    <span className="w-12 text-center font-semibold">
+      {item.quantity}
+    </span>
+
+    {/* INCREASE */}
+    <button
+      onClick={() =>
+        updateQuantity(
+          item.product.id,
+          Math.min(item.quantity + 1, item.product.stock)
+        )
+      }
+      disabled={item.quantity >= item.product.stock}
+      className="w-8 h-8 rounded-lg border border-gray-300 bg-white
+                 flex items-center justify-center
+                 disabled:opacity-50 disabled:cursor-not-allowed
+                 hover:bg-gray-50"
+    >
+      +
+    </button>
+  </div>
+
+  {/* REMOVE */}
+  <button
+    onClick={() => removeFromCart(item.product.id)}
+    className="text-red-500 hover:text-red-700 p-2"
+  >
+    <FontAwesomeIcon icon={faTrash} />
+  </button>
+</div>
+
                 </div>
               ))}
             </div>
@@ -115,6 +172,26 @@ export default function CartPage() {
           <div className="bg-white rounded-2xl shadow-sm p-6 sticky top-24">
             <h2 className="text-xl font-semibold text-gray-800 mb-6">Order Summary</h2>
             
+            <div className="space-y-0  mb-6 space-x-2 w-full">
+              Shipping Address : <span className='lowercase'>{user?.address}</span> 
+              <button onClick={addressHandler} className='text-blue-500'>Change</button>
+             {addressChange && (<>
+             <input type='text' 
+             name='address'
+              required
+              onChange={handleChange}
+              className="px-4 py-2 border rounded-lg focus:ring-2 focus:ring-teal-500 outline-none" />
+            
+            <button
+              type="submit"
+              disabled={loading}
+              onClick={(e) => updateHandler(e)}
+              className="bg-teal-600 text-white py-3 px-4 rounded-lg font-semibold hover:bg-teal-700 transition mt-2"
+            >Update</button>
+            </>)
+            }
+            <span>{error}</span>
+            </div>
             <div className="space-y-4 mb-6">
               <div className="flex justify-between text-gray-600">
                 <span>Subtotal</span>
@@ -137,11 +214,11 @@ export default function CartPage() {
             </div>
 
             <Link
-              href="/checkout"
-              className="block w-full bg-emerald-500 text-white py-3 rounded-lg font-semibold hover:bg-emerald-600 transition-colors mb-4 text-center"
-            >
-              Proceed to Checkout
-            </Link>
+  href={user ? "/checkout" : "/login"}
+  className={`block w-full py-3 rounded-lg font-semibold mb-4 text-center transition-colors bg-emerald-500 text-white hover:bg-emerald-600`}
+>
+  Proceed to Checkout
+</Link>
             
             <Link
               href="/"

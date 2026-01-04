@@ -13,6 +13,7 @@ export default function RegisterPage() {
     mobile_number: '',
     address: '',
     gstin: '',
+    pincode: '',
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -84,6 +85,13 @@ export default function RegisterPage() {
             onChange={handleChange}
             className="px-4 py-3 border rounded-lg focus:ring-2 focus:ring-teal-500 outline-none"
           />
+          <input
+            name="pincode"
+            type="number"
+            placeholder="Pincode"
+            onChange={handleChange}
+            className="px-4 py-3 border rounded-lg focus:ring-2 focus:ring-teal-500 outline-none"
+          />
 
           <input
             name="gstin"
@@ -94,7 +102,7 @@ export default function RegisterPage() {
 
           <input
             name="address"
-            placeholder="Address"
+            placeholder="Shipping address"
             required
             onChange={handleChange}
             className="px-4 py-3 border rounded-lg focus:ring-2 focus:ring-teal-500 outline-none"

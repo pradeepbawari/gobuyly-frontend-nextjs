@@ -109,7 +109,7 @@ export default function Home() {
       setLoading(true)
       // Fetch products for this subcategory
       const productsData = await getProducts({
-        subcategory_id: subcategoryId,
+        category_id: subcategoryId,
         // category_id:24
       })
       
