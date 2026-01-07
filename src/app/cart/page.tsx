@@ -8,13 +8,17 @@ import Image from 'next/image'
 import { useAuth } from '@/context/AuthContext.'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
+import { updateUser } from '@/lib/api'
+import HeaderPincodeChecker from '@/components/layout/HeaderPincodeChecker'
 
 export default function CartPage() {
   const { cart, total, removeFromCart, updateQuantity, clearCart } = useCart()
   const { user } = useAuth();
+  const { login } = useAuth();
   const router = useRouter();
   const [addressChange, setAddressChange] = useState(false)
   const [loading, setLoading] = useState(false)
+  const [pincode, setPincode] = useState<string | null>(null)
   const [form, setForm] = useState({
     name: '',
     email: '',
@@ -22,10 +26,10 @@ export default function CartPage() {
     mobile_number: '',
     address: '',
     gstin: '',
-    pincode: '',
+    pincode: pincode,
   });
   const [error, setError] = useState('');
-
+  
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
@@ -55,15 +59,36 @@ export default function CartPage() {
     user ? setAddressChange(!addressChange) : router.push('/login')
   }
 
-  const updateHandler = (e:any) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
-    console.log(form)
+  const updateHandler = async (e: any) => {
+    setForm({ ...form, [e.target.name]: e.target.value, pincode: pincode });
+    const userData = await updateUser({
+      form
+    })
+    let token: any = localStorage.getItem('token');
+    login(userData?.user, token)
+    setAddressChange(false)
+  }
+
+  const handlePincodeChange = (data: {
+    pincode: string | null
+    isValid: boolean | null
+  }) => {
+
+    if (data?.isValid === false) {
+      setPincode('000000')
+    } else {
+      setPincode(data?.pincode)
+    }
+  }
+
+  const handleProceed = () => {
+    {user ? router.push('order')  : router.push('login')}
   }
 
   return (
     <div className="container mx-auto px-4 py-6">
       <h2 className="text-2xl font-bold text-gray-800 mb-0 border-b-2 border-gray-200 pb-2">Shopping Cart</h2>
-      
+
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Cart Items */}
         <div className="lg:col-span-2">
@@ -100,7 +125,7 @@ export default function CartPage() {
                       </div>
                     )}
                   </div>
-                  
+
                   {/* Product Info */}
                   <div className="flex-1">
                     <h3 className="font-semibold text-gray-800">{item.product.name}</h3>
@@ -110,56 +135,56 @@ export default function CartPage() {
 
                   {/* Quantity Controls */}
                   <div className="flex items-center gap-3">
-  <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2">
 
-    {/* DECREASE */}
-    <button
-      onClick={() =>
-        updateQuantity(
-          item.product.id,
-          Math.max(1, item.quantity - 1)
-        )
-      }
-      disabled={item.quantity === 1}
-      className="w-8 h-8 rounded-lg border border-gray-300 bg-white
+                      {/* DECREASE */}
+                      <button
+                        onClick={() =>
+                          updateQuantity(
+                            item.product.id,
+                            Math.max(1, item.quantity - 1)
+                          )
+                        }
+                        disabled={item.quantity === 1}
+                        className="w-8 h-8 rounded-lg border border-gray-300 bg-white
                  flex items-center justify-center
                  disabled:opacity-50 disabled:cursor-not-allowed
                  hover:bg-gray-50"
-    >
-      -
-    </button>
+                      >
+                        -
+                      </button>
 
-    {/* QUANTITY */}
-    <span className="w-12 text-center font-semibold">
-      {item.quantity}
-    </span>
+                      {/* QUANTITY */}
+                      <span className="w-12 text-center font-semibold">
+                        {item.quantity}
+                      </span>
 
-    {/* INCREASE */}
-    <button
-      onClick={() =>
-        updateQuantity(
-          item.product.id,
-          Math.min(item.quantity + 1, item.product.stock)
-        )
-      }
-      disabled={item.quantity >= item.product.stock}
-      className="w-8 h-8 rounded-lg border border-gray-300 bg-white
+                      {/* INCREASE */}
+                      <button
+                        onClick={() =>
+                          updateQuantity(
+                            item.product.id,
+                            Math.min(item.quantity + 1, item.product.stock)
+                          )
+                        }
+                        disabled={item.quantity >= item.product.stock}
+                        className="w-8 h-8 rounded-lg border border-gray-300 bg-white
                  flex items-center justify-center
                  disabled:opacity-50 disabled:cursor-not-allowed
                  hover:bg-gray-50"
-    >
-      +
-    </button>
-  </div>
+                      >
+                        +
+                      </button>
+                    </div>
 
-  {/* REMOVE */}
-  <button
-    onClick={() => removeFromCart(item.product.id)}
-    className="text-red-500 hover:text-red-700 p-2"
-  >
-    <FontAwesomeIcon icon={faTrash} />
-  </button>
-</div>
+                    {/* REMOVE */}
+                    <button
+                      onClick={() => removeFromCart(item.product.id)}
+                      className="text-red-500 hover:text-red-700 p-2"
+                    >
+                      <FontAwesomeIcon icon={faTrash} />
+                    </button>
+                  </div>
 
                 </div>
               ))}
@@ -171,26 +196,34 @@ export default function CartPage() {
         <div className="lg:col-span-1">
           <div className="bg-white rounded-2xl shadow-sm p-6 sticky top-24">
             <h2 className="text-xl font-semibold text-gray-800 mb-6">Order Summary</h2>
-            
+
             <div className="space-y-0  mb-6 space-x-2 w-full">
-              Shipping Address : <span className='lowercase'>{user?.address}</span> 
-              <button onClick={addressHandler} className='text-blue-500'>Change</button>
-             {addressChange && (<>
-             <input type='text' 
-             name='address'
-              required
-              onChange={handleChange}
-              className="px-4 py-2 border rounded-lg focus:ring-2 focus:ring-teal-500 outline-none" />
-            
-            <button
-              type="submit"
-              disabled={loading}
-              onClick={(e) => updateHandler(e)}
-              className="bg-teal-600 text-white py-3 px-4 rounded-lg font-semibold hover:bg-teal-700 transition mt-2"
-            >Update</button>
-            </>)
-            }
-            <span>{error}</span>
+              <div>
+                Shipping Address : <span className='lowercase mr-3'>{user?.address}</span>
+                PinCode : <span className='lowercase'>{user?.pincode}</span>
+              </div>
+              {addressChange && (<div className='bg-gray-200 p-3'>
+                <div className='flex flex-col gap-2 mt-3'>
+                  Shipping Address :
+                  <input type='text'
+                    name='address'
+                    required
+                    onChange={handleChange}
+                    className="px-4 py-2 border rounded-lg focus:ring-2 focus:ring-teal-500 outline-none bg-white" />
+                  <div className="w-[220px] bg-white">
+                    <HeaderPincodeChecker onChange={handlePincodeChange} />
+                  </div>
+                </div>
+                <button
+                  type="submit"
+                  disabled={pincode == '000000'}
+                  onClick={(e) => updateHandler(e)}
+                  className={`text-white py-1 px-4 rounded-lg font-normal hover:bg-teal-700 transition mt-2 ${pincode == '000000' ? 'bg-gray-400 cursor-not-allowed' : 'bg-green-600'}`}
+                >Update</button>
+              </div>)
+              }
+              <button onClick={addressHandler} className='text-blue-500'>{addressChange ? 'Cancel' : 'Change'}</button>
+              <span>{error}</span>
             </div>
             <div className="space-y-4 mb-6">
               <div className="flex justify-between text-gray-600">
@@ -213,13 +246,16 @@ export default function CartPage() {
               </div>
             </div>
 
-            <Link
-  href={user ? "/checkout" : "/login"}
-  className={`block w-full py-3 rounded-lg font-semibold mb-4 text-center transition-colors bg-emerald-500 text-white hover:bg-emerald-600`}
->
-  Proceed to Checkout
-</Link>
-            
+            <button onClick={handleProceed} className={`block w-full py-3 rounded-lg font-semibold mb-4 text-center transition-colors bg-emerald-500 text-white hover:bg-emerald-600`}
+            >Proceed to Checkout</button>
+
+            {/* <Link
+              href={user ? "/checkout" : "/login"}
+              className={`block w-full py-3 rounded-lg font-semibold mb-4 text-center transition-colors bg-emerald-500 text-white hover:bg-emerald-600`}
+            >
+              Proceed to Checkout
+            </Link> */}
+
             <Link
               href="/"
               className="block w-full border border-gray-300 text-gray-700 py-3 rounded-lg font-semibold hover:bg-gray-50 transition-colors inline-flex items-center justify-center gap-2"

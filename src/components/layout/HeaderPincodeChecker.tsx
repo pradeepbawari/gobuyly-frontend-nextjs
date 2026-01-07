@@ -1,73 +1,94 @@
-// components/HeaderPincodeChecker.tsx
 'use client'
 
-import { ChangeEvent, useState } from 'react'
+import { ChangeEvent, useEffect, useState, useCallback } from 'react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faMapMarkerAlt, faCheck, faTimes, faTruck } from '@fortawesome/free-solid-svg-icons'
+import { faMapMarkerAlt, faCheck, faTimes } from '@fortawesome/free-solid-svg-icons'
 
-// Only these pincodes are allowed
-const ALLOWED_PINCODES = [
-  '110094', '110093',
-  '110001', '110020', '110025',
-  '400001', '500001', '560001',
-  '600001', '700001', '411001',
-  '122001', '201301'
-]
+const ALLOWED_PINCODES = new Set([
+  '110001', '110097',
+])
 
-export default function HeaderPincodeChecker() {
-  const [pincode, setPincode] = useState('')
-  const [isValid, setIsValid] = useState<boolean | null>(null)
-  const [isChecking, setIsChecking] = useState(false)
-  const [savedPincode, setSavedPincode] = useState<string | null>(null)
+/* ---------- Types ---------- */
+export type PincodeStatus = {
+  pincode: string | null
+  isValid: boolean | null
+}
 
-  const checkPincode = () => {
-    if (pincode.length !== 6) {
-      setIsValid(false)
+type Props = {
+  onChange?: (data: PincodeStatus) => void
+}
+
+/* ---------- Component ---------- */
+export default function HeaderPincodeChecker({ onChange }: Props) {
+  const [input, setInput] = useState('')
+  const [status, setStatus] = useState<PincodeStatus>({
+    pincode: null,
+    isValid: null,
+  })
+  const [loading, setLoading] = useState(false)
+
+  /* ---------- Init from localStorage ---------- */
+  useEffect(() => {
+    const stored = localStorage.getItem('userPincode')
+    if (stored) {
+      const initStatus = { pincode: stored, isValid: true }
+      setStatus(initStatus)
+      onChange?.(initStatus)
+    }
+  }, [onChange])
+
+  /* ---------- Helpers ---------- */
+  const updateStatus = useCallback(
+    (data: PincodeStatus) => {
+      setStatus(data)
+      onChange?.(data)
+    },
+    [onChange]
+  )
+
+  const validatePincode = useCallback(() => {
+    if (input.length !== 6) {
+      updateStatus({ pincode: null, isValid: false })
       return
     }
 
-    setIsChecking(true)
-    
-    // Simulate API call delay
-    setTimeout(() => {
-      const isValidPincode = ALLOWED_PINCODES.includes(pincode)
-      setIsValid(isValidPincode)
-      setIsChecking(false)
-      
-      if (isValidPincode) {
-        setSavedPincode(pincode)
-        localStorage.setItem('userPincode', pincode)
-      }
-    }, 500)
-  }
+    setLoading(true)
 
-  const handleKeyPress = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter') {
-      checkPincode()
-    }
-  }
+    setTimeout(() => {
+      const isValid = ALLOWED_PINCODES.has(input)
+
+      if (isValid) {
+        localStorage.setItem('userPincode', input)
+        updateStatus({ pincode: input, isValid: true })
+      } else {
+        updateStatus({ pincode: null, isValid: false })
+      }
+
+      setLoading(false)
+    }, 400)
+  }, [input, updateStatus])
 
   const clearPincode = () => {
-    setPincode('')
-    setIsValid(null)
-    setSavedPincode(null)
-    localStorage.removeItem('userPincode')	
-  }
-  
-  const statusHandler = (e: ChangeEvent<HTMLInputElement>) => {
-	  setPincode(e.target.value.replace(/\D/g, '').slice(0, 6))
+    localStorage.removeItem('userPincode')
+    setInput('')
+    updateStatus({ pincode: null, isValid: null })
   }
 
+  const onInputChange = (e: ChangeEvent<HTMLInputElement>) => {
+    setInput(e.target.value.replace(/\D/g, '').slice(0, 6))
+  }
+
+  /* ---------- UI ---------- */
   return (
     <div className="relative">
-      {savedPincode ? (
-        // Display saved pincode
+      {status.pincode ? (
+        /* ----- Saved View ----- */
         <div className="flex items-center gap-2">
           <FontAwesomeIcon icon={faMapMarkerAlt} className="text-red-500 text-sm" />
-          <div className="flex flex-col">
-            <span className="text-xs text-gray-600">Deliver to</span>
+          <div>
+            <span className="text-xs text-gray-500">Deliver to</span>
             <div className="flex items-center gap-2">
-              <span className="text-sm font-medium">{savedPincode}</span>
+              <span className="text-sm font-medium">{status.pincode}</span>
               <button
                 onClick={clearPincode}
                 className="text-xs text-gray-500 hover:text-red-500"
@@ -78,47 +99,44 @@ export default function HeaderPincodeChecker() {
           </div>
         </div>
       ) : (
-        // Pincode input form
-        <div className="relative">
-          <div className="flex items-center border border-gray-300 rounded-md overflow-hidden">
-            <div className="pl-3 pr-2">
-              <FontAwesomeIcon icon={faMapMarkerAlt} className="text-gray-400 text-sm" />
-            </div>
-            
+        /* ----- Input View ----- */
+        <div>
+          <div className="flex items-center border rounded-md overflow-hidden">
+            <span className="px-3 text-gray-400">
+              <FontAwesomeIcon icon={faMapMarkerAlt} />
+            </span>
+
             <input
-              type="text"
-              value={pincode}
-              onChange={(e) => statusHandler(e)}
-              onKeyPress={handleKeyPress}
+              value={input}
+              onChange={onInputChange}
               placeholder="Enter pincode"
-              className="px-2 py-1.5 text-sm w-32 outline-none border-none"
+              className="w-28 px-2 py-1.5 text-sm outline-none"
               maxLength={6}
             />
-            
+
             <button
-              onClick={checkPincode}
-              disabled={isChecking || pincode.length !== 6}
-              className="px-3 py-1.5 bg-emerald-500 text-white text-sm font-medium
-                         hover:bg-emerald-600 transition-colors
-                         disabled:opacity-50 disabled:cursor-not-allowed"
+              onClick={validatePincode}
+              disabled={loading || input.length !== 6}
+              className="px-3 py-1.5 bg-emerald-500 text-white text-sm
+                         disabled:opacity-50 hover:bg-emerald-600"
             >
-              {isChecking ? 'Checking...' : 'Check'}
+              {loading ? 'Checking…' : 'Check'}
             </button>
           </div>
 
-          {/* Validation message */}
-          {isValid !== null && (
-            <div className="absolute top-full left-0 right-0 mt-1 text-xs">
-              {isValid ? (
-                <div className="flex items-center gap-1 text-emerald-600">
-                  <FontAwesomeIcon icon={faCheck} className="text-xs" />
-                  <span>Delivery available to this pincode</span>
-                </div>
+          {/* ----- Status Message ----- */}
+          {status.isValid !== null && (
+            <div className="mt-1 text-xs flex items-center gap-1">
+              {status.isValid ? (
+                <span className="text-emerald-600 flex items-center gap-1">
+                  <FontAwesomeIcon icon={faCheck} />
+                  Delivery available
+                </span>
               ) : (
-                <div className="flex items-center gap-1 text-red-600">
-                  <FontAwesomeIcon icon={faTimes} className="text-xs" />
-                  <span>Delivery not available</span>
-                </div>
+                <span className="text-red-600 flex items-center gap-1">
+                  <FontAwesomeIcon icon={faTimes} />
+                  Delivery not available
+                </span>
               )}
             </div>
           )}

@@ -10,6 +10,7 @@ interface User {
   address?: string
   mobile_number?:number
   gst?:any
+  pincode:number
 }
 
 interface AuthContextType {

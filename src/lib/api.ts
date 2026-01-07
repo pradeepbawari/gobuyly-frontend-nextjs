@@ -321,3 +321,60 @@ export async function loginUser(form: any) {
     return { error: 'Something went wrong' };
   }
 }
+export async function updateUser(form: any) {
+  try {
+    const token = localStorage.getItem('token');
+    let userId = localStorage.getItem('user');
+    const formData:any = JSON.parse(userId ?? '')
+    let dataUser:any = {id: formData?.id, address: form?.form?.address, pincode: formData.pincode};
+    const response = await fetch(`${API_URL}/api/users/userupdate`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify(dataUser),
+    });
+
+    const data = await response.json(); // ✅ ALWAYS parse JSON
+
+    if (!response.ok) {
+      // ✅ send backend error to frontend
+      return { error: data.error };
+    }
+
+    return data;
+  } catch (error: any) {
+    console.error('Register error:', error.message);
+    return { error: 'Something went wrong' };
+  }
+}
+
+export async function userOrders(form: any) {
+  try {
+    const token = localStorage.getItem('token');
+    let userId = localStorage.getItem('user');
+    const formData:any = JSON.parse(userId ?? '')
+    let dataUser:any = {id: formData?.id, address: form?.form?.address, pincode: formData.pincode};
+    const response = await fetch(`${API_URL}/api/orders/userOrders`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify(dataUser),
+    });
+
+    const data = await response.json(); // ✅ ALWAYS parse JSON
+
+    if (!response.ok) {
+      // ✅ send backend error to frontend
+      return { error: data.error };
+    }
+
+    return data;
+  } catch (error: any) {
+    console.error('Register error:', error.message);
+    return { error: 'Something went wrong' };
+  }
+}
