@@ -16,7 +16,7 @@ export default function ProfilePage() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     console.log('Profile updated:', formData)
-    alert('Profile updated successfully!')
+    //alert('Profile updated successfully!')
   }
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {

@@ -105,12 +105,12 @@ export default function ProductCard({ product = {} }: ProductCardProps) {
   return (
     <>
       <div
-        className="grid grid-cols-13 items-center gap-5 bg-white px-3 py-4 rounded-xl mb-3
-                 shadow-sm border border-gray-200 transition-all duration-200
+        className="grid grid-cols-[101px_repeat(11,minmax(0,1fr))_40px] items-center gap-5 bg-white px-3 py-2 mb-3
+                 rounded-lg border-b-1 border-gray-200 transition-all duration-200
                  hover:shadow-md hover:border-emerald-500 hover:-translate-y-0.5"
       >
         {/* Product Image with Zoom Preview */}
-        <div className="col-span-2 relative">
+        <div className="col-span-1 relative w-[100px]">
           {mainImage ? (
             <div
               className="relative w-18 h-18 mx-auto cursor-zoom-in group"
@@ -144,7 +144,7 @@ export default function ProductCard({ product = {} }: ProductCardProps) {
             </div>
           ) : (
             <div 
-              className="w-24 h-28 bg-gray-100 rounded-lg flex items-center justify-center mx-auto cursor-pointer"
+              className="w-24 h-24 bg-gray-100 rounded-lg flex items-center justify-center cursor-pointer"
               onClick={handleImageClick}
             >
               <span className="text-gray-400 text-xs">No Image</span>
@@ -188,9 +188,9 @@ export default function ProductCard({ product = {} }: ProductCardProps) {
 
         {/* Rest of your existing product card code remains the same */}
         {/* Product Details */}
-        <div className="col-span-4">
+        <div className="col-span-5">
 		<div className="flex justify-between gap-3">
-        <h4 className="font-semibold text-gray-800 text-lg">
+        <h4 className="font-semibold text-gray-800 text-md">
           {/* <span>
             {product?.title?.company_id} {product?.product_name} {product?.title?.size} {product?.title?.materials} {product?.title?.color_id !== 'No Colour' ? product?.title?.color_id : ''}
           </span> */}
@@ -200,9 +200,9 @@ export default function ProductCard({ product = {} }: ProductCardProps) {
 		  </h4>
  {product?.title?.company_id && <span className="text-xs font-medium text-gray-600 px-2 py-1.5 h-7 rounded uppercase bg-gray-100">{product?.title?.company_id}</span>}
 </div>
-          <p className="text-gray-500 text-[13px] mb-2 line-clamp-2">
+          {/* <p className="text-gray-500 text-[13px] mb-2 line-clamp-2">
             {product.description || 'Premium product'}
-          </p>
+          </p> */}
 
           <div className="flex items-center gap-3">
             <div className="flex items-center">

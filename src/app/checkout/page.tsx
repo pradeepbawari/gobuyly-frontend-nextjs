@@ -22,7 +22,7 @@ export default function CheckoutPage() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     console.log('Checkout submitted:', formData)
-    alert('Order placed successfully!')
+    //alert('Order placed successfully!')
     // In real app, you would send this to your backend
   }
 

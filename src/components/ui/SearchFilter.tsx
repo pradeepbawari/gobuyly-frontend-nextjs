@@ -3,38 +3,33 @@
 import { useState, useEffect } from 'react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faChevronDown, faArrowRight, faSearch, faTimes } from '@fortawesome/free-solid-svg-icons'
+import { brandList } from '@/lib/api'
 
 interface SearchFilterProps {
   onSearch: (filters: { searchQuery: string; selectedBrand: string }) => void
   initialBrand?: string
   initialSearch?: string
+  initialBrandData?: any
 }
 
 interface Brand {
-  id: string
+  company_id: string
   name: string
 }
 
 export default function SearchFilter({ 
   onSearch, 
   initialBrand = '', 
-  initialSearch = '' 
+  initialSearch = '',
+  initialBrandData = ''
 }: SearchFilterProps) {
-  const defaultBrands: Brand[] = [
-  { id: '', name: 'All Brands' },
-  { id: '12', name: 'KWS' },
-  { id: '11', name: 'Prestige' },
-  { id: '3', name: 'Pigeon' },
-  { id: '4', name: 'Milton' },
-  { id: '5', name: 'Nirlon' },
-]
 const [searchQuery, setSearchQuery] = useState(initialSearch)
 const [selectedBrand, setSelectedBrand] = useState<string>(initialBrand)
 const [brands, setBrands] = useState<Brand[]>([])
 
   // Load brands from API or use default
   useEffect(() => {
-    setBrands(defaultBrands)
+    setBrands(initialBrandData)
   }, [])
 
   const handleSearch = (e: React.FormEvent) => {
@@ -64,7 +59,7 @@ const handleClearFilters = () => {
 
 
   return (
-    <div className="bg-white rounded-2xl shadow-sm p-5 mb-6 border border-gray-100">
+    <div className="bg-white pt-5 pb-3">
       <div className="flex flex-col md:flex-row gap-4 items-center">
         {/* Brand Filter */}
         <div className="flex-1 md:flex-initial">
@@ -75,8 +70,11 @@ const handleClearFilters = () => {
   onChange={(e) => handleBrandChange(e.target.value)}
   className="w-full md:w-48 border-gray-300 rounded-xl pl-4 pr-10 py-3 text-sm focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 appearance-none bg-white"
 >
-  {brands.map((brand) => (
-    <option key={brand.id} value={brand.id}>
+    <option id='' value=''>
+      {'All Brands'}
+    </option>
+    {brands.map((brand) => (
+    <option key={brand.company_id} value={brand.company_id}>
       {brand.name}
     </option>
   ))}
@@ -112,7 +110,7 @@ const handleClearFilters = () => {
             {(searchQuery || (selectedBrand && selectedBrand !== 'All Brands')) && (
               <button
                 onClick={handleClearFilters}
-                className="absolute right-14 top-2 text-gray-500 hover:text-gray-700 p-2"
+                className="absolute right-14 top-0 text-gray-500 hover:text-gray-700 p-2"
                 title="Clear filters"
               >
                 <FontAwesomeIcon icon={faTimes} className="text-sm" />

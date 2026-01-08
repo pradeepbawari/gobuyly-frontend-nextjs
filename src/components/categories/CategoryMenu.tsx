@@ -6,16 +6,12 @@ import {
   faListUl, 
   faChevronRight, 
   faCircle,
-  faFolder,
-  faFolderOpen,
-  faAngleRight
 } from '@fortawesome/free-solid-svg-icons'
-import { getCategories } from '@/lib/api'
-import Image from 'next/image'
 
 interface CategoryMenuProps {
   onCategorySelect?: (categoryId: number | null, categoryName?: string) => void
   onSubcategorySelect?: (subcategoryId: number, subcategoryName: string) => void
+  initialCategory?:any
 }
 
 interface Subcategory {
@@ -47,14 +43,14 @@ function SubcategoryItem({ subcategory, level, activeCategory, onSelect }: Subca
 
   // Calculate text size based on level
   const getTextSize = (level: number) => {
-    if (level === 0) return 'text-[15px]'          // First level subcategory
+    if (level === 0) return 'text-[14px] text-green-600'          // First level subcategory
     if (level === 1) return 'text-[14px]'          // Second level subcategory
     return 'text-xs font-light'                // Third+ level subcategory (smaller and lighter)
   }
 
   // Calculate padding based on level
   const getPadding = (level: number) => {
-    if (level === 0) return 'p-2'
+    if (level === 0) return 'p-1.5'
     if (level === 1) return 'p-1.5 pl-6'
     return 'p-1'
   }
@@ -81,9 +77,9 @@ function SubcategoryItem({ subcategory, level, activeCategory, onSelect }: Subca
         className={`${getPadding(level)} hover:bg-emerald-50 cursor-pointer transition-all border border-transparent hover:border-emerald-100 flex items-center justify-between group`}
         style={{ marginLeft: `${level * 16}px` }}
       >
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2">
           {subcategory.icon ? (
-            <div className={`${level === 0 ? 'w-6 h-6' : level === 1 ? 'w-5 h-5' : 'w-4 h-4'} rounded-md overflow-hidden bg-gray-100 flex items-center justify-center`}>
+            <div className={`${level === 0 ? 'w-3 h-3' : level === 1 ? 'w-3 h-3' : 'w-3 h-3'} rounded-md overflow-hidden bg-gray-100 flex items-center justify-center`}>
               <FontAwesomeIcon 
               icon={hasChildren ? (isExpanded ? faCircle : faCircle) : faCircle} 
               className={`${getIconSize(level)} ${
@@ -134,26 +130,31 @@ function SubcategoryItem({ subcategory, level, activeCategory, onSelect }: Subca
   )
 }
 
-export default function CategoryMenu({ onCategorySelect, onSubcategorySelect }: CategoryMenuProps) {
+export default function CategoryMenu({ onCategorySelect, onSubcategorySelect, initialCategory }: CategoryMenuProps) {
   const [categories, setCategories] = useState<Category[]>([])
   const [activeCategory, setActiveCategory] = useState<number | null>(null)
   const [expandedCategories, setExpandedCategories] = useState<number[]>([])
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    loadCategories()
-  }, [])
+  if (initialCategory && initialCategory.length > 0) {
+    setCategories(initialCategory)
+    setLoading(false)
 
-  const loadCategories = async () => {
-    try {
-      const data = await getCategories()
-      setCategories(data.categories || [])
-    } catch (error) {
-      console.error('Failed to load categories:', error)
-    } finally {
-      setLoading(false)
+    // Open only the first category
+    const firstCategory = initialCategory[0]
+    setActiveCategory(firstCategory.id)
+    setExpandedCategories([firstCategory.id])
+
+    // Optional: notify parent
+    if (onCategorySelect) {
+      onCategorySelect(firstCategory.id, firstCategory.name)
     }
+  } else {
+    setLoading(true)
   }
+}, [initialCategory])
+
 
   const handleCategoryClick = (categoryId: number, categoryName?: string) => {
     if (activeCategory === categoryId) {
@@ -187,13 +188,13 @@ export default function CategoryMenu({ onCategorySelect, onSubcategorySelect }: 
   }
 
   return (
-    <div className="w-72 bg-white shadow-sm p-6 border border-gray-100 rounded-xl">
-      <h3 className="font-bold text-lg mb-6 text-gray-800 flex items-center gap-2">
+    <div className="w-72 bg-white shadow-sm pt-4 pl-3 border border-gray-100 h-[100%]">
+      <h3 className="font-bold text-lg mb-2 text-gray-800 flex items-center gap-2">
         <FontAwesomeIcon icon={faListUl} className="text-emerald-500" /> 
         All Categories
       </h3>
 
-      <div className="space-y-1">
+      <div>
         {categories.map((category) => {
           const isExpanded = expandedCategories.includes(category.id)
           const hasSubcategories = category.subcategories && category.subcategories.length > 0
@@ -202,7 +203,7 @@ export default function CategoryMenu({ onCategorySelect, onSubcategorySelect }: 
             <div key={category.id} className="rounded-lg overflow-hidden">
               <div
                 onClick={() => handleCategoryClick(category.id, category.name)}
-                className="p-3 hover:bg-emerald-50 cursor-pointer transition-all border border-transparent hover:border-emerald-100 flex items-center justify-between group"
+                className="pl-0 pb-0 pt-2 pr-3 hover:bg-emerald-50 cursor-pointer transition-all border border-transparent hover:border-emerald-100 flex items-center justify-between group"
               >
                 <div className="flex items-center gap-3">
                   <div className="w-8 h-8 rounded-lg bg-emerald-100 flex items-center justify-center text-emerald-600">
@@ -226,7 +227,7 @@ export default function CategoryMenu({ onCategorySelect, onSubcategorySelect }: 
                     isExpanded ? 'max-h-[2000px] opacity-100' : 'max-h-0 opacity-0'
                   }`}
                 >
-                  <div className="ml-8 pl-3 border-l-2 border-emerald-100">
+                  <div className="ml-5 pl-3 border-l-2 border-emerald-100">
                     {category.subcategories.map((subcategory) => (
                       <SubcategoryItem
                         key={subcategory.id}

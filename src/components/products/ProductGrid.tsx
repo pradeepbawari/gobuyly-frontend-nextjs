@@ -68,16 +68,6 @@ export default function ProductGrid({ products = [], loading = false }: ProductG
 
   return (
     <div>
-      {/* Table Header - EXACT MOCKUP STYLE */}
-      {/* <div className="grid grid-cols-12 gap-6 px-5 py-3 bg-emerald-50 rounded-t-xl border border-emerald-100 mb-2 font-medium text-gray-700 text-sm">
-        <div className="col-span-1">PRODUCT</div>
-        <div className="col-span-4">DETAILS</div>
-        <div className="col-span-2">STOCK STATUS</div>
-        <div className="col-span-2">PRICE</div>
-        <div className="col-span-2">QUANTITY</div>
-        <div className="col-span-1">ACTIONS</div>
-      </div> */}
-
       {/* Products Display - Only Table View */}
       <div className="space-y-3">
         {currentProducts.map((product) => (

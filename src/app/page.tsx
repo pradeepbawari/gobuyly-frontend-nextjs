@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from 'react'
 import CategoryMenu from '@/components/categories/CategoryMenu'
 import ProductGrid from '@/components/products/ProductGrid'
 import SearchFilter from '@/components/ui/SearchFilter'
-import { getCategories, getProducts, getsearchProducts, transformProduct } from '@/lib/api'
+import { brandList, getCategories, getProducts, getsearchProducts, transformProduct } from '@/lib/api'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faCutlery } from '@fortawesome/free-solid-svg-icons'
 
@@ -28,6 +28,7 @@ interface Category {
 
 export default function Home() {
   const [categories, setCategories] = useState<Category[]>([])
+  const [brandListData, setBrandListData] = useState<Category[]>([])
   const [allProducts, setAllProducts] = useState<Product[]>([])
   const [filteredProducts, setFilteredProducts] = useState<Product[]>([])
   const [loading, setLoading] = useState(true)
@@ -62,12 +63,14 @@ export default function Home() {
   const loadInitialData = async () => {
     try {
       setLoading(true)
-      const [categoriesData, productsData] = await Promise.all([
+      const [categoriesData, brandData, productsData] = await Promise.all([
         getCategories(),
+        brandList(),
         getProducts()
       ])
-      
       setCategories(categoriesData?.categories || [])
+      setBrandListData(brandData?.brand)
+      const brand = brandData
       const products = productsData?.variants?.rows?.map(transformProduct) || []
       setAllProducts(products)
       setFilteredProducts(products)
@@ -167,36 +170,40 @@ export default function Home() {
 
   return (
     <div className="flex min-h-[calc(100vh-140px)]">
-      <div className="flex-1 p-6 overflow-y-auto bg-white">
-        <div className="flex flex-col lg:flex-row gap-6">
+      <div className="flex-1 p-0 pr-3 overflow-y-auto bg-white">
+        <div className="flex flex-col lg:flex-row gap-4">
           {/* Category Sidebar */}
           <div>
             <CategoryMenu 
               onSubcategorySelect={handleSubcategorySelect}
+              initialCategory={categories}
             />
           </div>
           
           {/* Main Content */}
           <div className="w-full">
             {/* Search & Filters */}
-            <SearchFilter 
+           {brandListData && brandListData.length > 0 && <SearchFilter 
               onSearch={handleSearch}
               initialBrand={searchFilters.selectedBrand}
               initialSearch={searchFilters.searchQuery}
+              initialBrandData={brandListData}
             />
+           }
 
             {/* Products Header */}
-            <div className="flex items-center justify-between mb-6">
+            <div className="flex items-center justify-between mb-2">
               <div>
-                <h2 className="text-2xl font-bold text-gray-800 gap-2 flex">
+                {/* {JSON.stringify(filteredProducts)} */}
+                <h2 className="text-1xl font-normal text-gray-500 gap-2 flex">
                   <FontAwesomeIcon icon={faCutlery} className="text-green-600" />
                   {selectedSubcategory ? selectedSubcategory : 'All Products'}
                 </h2>
-                <p className="text-gray-500 text-sm mt-1">
+                {/* <p className="text-gray-500 text-sm mt-1">
                   {selectedSubcategory 
                     ? 'Showing products from selected category' 
                     : 'Browse our premium collection'}
-                </p>
+                </p> */}
               </div>
               
               <div className="flex items-center gap-3">
@@ -216,7 +223,7 @@ export default function Home() {
               </div>
             </div>
 
-            {/* Products Grid */}
+            {/* Products Grid */}            
             <ProductGrid products={filteredProducts} loading={loading} />
           </div>
         </div>
