@@ -152,7 +152,7 @@ export default function ProductCard({ product = {} }: ProductCardProps) {
           )}
 
           {/* Thumbnail Strip (if multiple images) */}
-          {allImages.length > 1 && (
+          {/* {allImages.length > 1 && (
             <div className="flex justify-start gap-1 mt-2">
               {allImages.slice(0, 3).map((img, index) => (
                 <button
@@ -183,7 +183,7 @@ export default function ProductCard({ product = {} }: ProductCardProps) {
                 </div>
               )}
             </div>
-          )}
+          )} */}
         </div>
 
         {/* Rest of your existing product card code remains the same */}
