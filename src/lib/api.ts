@@ -8,7 +8,6 @@ export async function getCategories(): Promise<any> {
     if (!response.ok) throw new Error('Failed to fetch categories');
     return await response.json();
   } catch (error) {
-    console.error('Error fetching categories:', error);
     throw error;
   }
 }
@@ -26,8 +25,6 @@ export async function getProducts(filters: any = {}) {
       filters: filters
     }
     
-    console.log('📦 API Payload:', JSON.stringify(payload, null, 2))
-    
     const response = await fetch(`${API_URL}/api/products_user/filterProductsNew`, {
       method: 'POST',
       headers: {
@@ -43,12 +40,8 @@ export async function getProducts(filters: any = {}) {
     }
     
     const data = await response.json()
-    console.log('✅ Products data received, count:', data.variants?.rows?.length || 0)
-    
     return data
   } catch (error) {
-    console.error('❌ Error fetching products:', error)
-    // Return empty structure instead of throwing
     return { variants: { rows: [] } }
   }
 }
@@ -63,8 +56,6 @@ export async function getsearchProducts(filters: any = {}) {
       filters: filters
     }
     
-    console.log('📦 API Payload:', JSON.stringify(payload, null, 2))
-    
     const response = await fetch(`${API_URL}/api/products_user/searchProducts`, {
       method: 'POST',
       headers: {
@@ -73,19 +64,14 @@ export async function getsearchProducts(filters: any = {}) {
       body: JSON.stringify(payload)
     })
     
-    console.log('📊 Response status:', response.status)
-    
     if (!response.ok) {
       throw new Error(`Failed to fetch products: ${response.status}`)
     }
     
     const data = await response.json()
-    console.log('✅ Products data received, count:', data.variants?.rows?.length || 0)
     
     return data
   } catch (error) {
-    console.error('❌ Error fetching products:', error)
-    // Return empty structure instead of throwing
     return { variants: { rows: [] } }
   }
 }
@@ -199,7 +185,8 @@ export function transformProduct(apiProduct: any) {
   let titleData = null;
   if (apiProduct.title && typeof apiProduct.title === 'string') {
     try {
-      titleData = JSON.parse(apiProduct.title);
+      // titleData = JSON.parse(apiProduct.title);
+      titleData = apiProduct.title;
     } catch (error) {
       console.error('Error parsing title:', error);
     }
@@ -213,6 +200,7 @@ export function transformProduct(apiProduct: any) {
     sku: apiProduct.sku,
     size: apiProduct.size,
     title: apiProduct.title,
+    displayTitle: apiProduct.displayTitle,
     images: apiProduct.images || [],
     primary_image: apiProduct.primary_image,
     
@@ -326,7 +314,7 @@ export async function updateUser(form: any) {
     const token = localStorage.getItem('token');
     let userId = localStorage.getItem('user');
     const formData:any = JSON.parse(userId ?? '')
-    let dataUser:any = {id: formData?.id, address: form?.form?.address, pincode: formData.pincode};
+    let dataUser:any = {id: formData?.id, address: form?.form?.address, pincode: form?.form?.pincode};
     const response = await fetch(`${API_URL}/api/users/userupdate`, {
       method: 'PUT',
       headers: {
@@ -364,6 +352,24 @@ export async function userOrders(form: any) {
       },
       body: JSON.stringify(dataUser),
     });
+
+    const data = await response.json(); // ✅ ALWAYS parse JSON
+
+    if (!response.ok) {
+      // ✅ send backend error to frontend
+      return { error: data.error };
+    }
+
+    return data;
+  } catch (error: any) {
+    console.error('Register error:', error.message);
+    return { error: 'Something went wrong' };
+  }
+}
+
+export async function brandList() {
+  try {
+    const response = await fetch(`${API_URL}/api/search/brandlist`);
 
     const data = await response.json(); // ✅ ALWAYS parse JSON
 
