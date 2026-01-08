@@ -24,15 +24,18 @@ export default function Header() {
             <HeaderPincodeChecker />
         </div>
 
-      <nav className="hidden md:flex gap-8 font-medium text-gray-700">
+      <nav className="hidden md:flex gap-8 font-normal text-gray-700">
         <Link href="/" className="hover:text-emerald-600 transition-colors flex items-center gap-1">
-          <FontAwesomeIcon icon={faHome} className="text-sm" /> Home
+          {/* <FontAwesomeIcon icon={faHome} className="text-sm" />  */}
+          Home
         </Link>
         <Link href="/products" className="hover:text-emerald-600 transition-colors flex items-center gap-1">
-          <FontAwesomeIcon icon={faShoppingBag} className="text-sm" /> Shop
+          {/* <FontAwesomeIcon icon={faShoppingBag} className="text-sm" />  */}
+          Shop
         </Link>
         <Link href="/account/orders" className="hover:text-emerald-600 transition-colors flex items-center gap-1">
-          <FontAwesomeIcon icon={faBox} className="text-sm" /> Orders
+          {/* <FontAwesomeIcon icon={faBox} className="text-sm" />  */}
+          Orders
         </Link>
         <Link href="/support" className="hover:text-emerald-600 transition-colors flex items-center gap-1">
           <FontAwesomeIcon icon={faHeadset} className="text-sm" /> Support

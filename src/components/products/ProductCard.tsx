@@ -232,11 +232,11 @@ export default function ProductCard({ product = {} }: ProductCardProps) {
 
         {/* Price */}
         <div className="col-span-1">
-          <div className="font-bold text-gray-800 text-lg">
+          <div className="font-bold text-gray-700 text-md">
             ₹{finalPrice.toLocaleString()}
           </div>
           {hasDiscount && (
-            <div className="text-xs text-gray-500 line-through">
+            <div className="text-xs text-gray-700 line-through">
               ₹{price.toLocaleString()}
             </div>
           )}

@@ -81,11 +81,11 @@ export default function Home() {
     }
   }
 
-  const handleSearch = async (filters: { searchQuery: string; selectedBrand: string }) => {
+  const handleSearch = async (filters: { searchQuery: string; selectedBrand: string, clear:boolean }) => {
     console.log('Search filters changed:', filters)
     setSearchFilters(filters)
     
-    if (filters.searchQuery || filters.selectedBrand) {
+    if (filters.searchQuery || filters.selectedBrand || filters.clear) {
       try {
         setLoading(true)
         const productsData = await getsearchProducts({
@@ -192,7 +192,7 @@ export default function Home() {
            }
 
             {/* Products Header */}
-            <div className="flex items-center justify-between mb-2">
+            <div className="flex items-center justify-between mb-2 mt-3">
               <div>
                 {/* {JSON.stringify(filteredProducts)} */}
                 <h2 className="text-1xl font-normal text-gray-500 gap-2 flex">

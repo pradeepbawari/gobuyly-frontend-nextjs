@@ -3,10 +3,9 @@
 import { useState, useEffect } from 'react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faChevronDown, faArrowRight, faSearch, faTimes } from '@fortawesome/free-solid-svg-icons'
-import { brandList } from '@/lib/api'
 
 interface SearchFilterProps {
-  onSearch: (filters: { searchQuery: string; selectedBrand: string }) => void
+  onSearch: (filters: { searchQuery: string; selectedBrand: string, clear:boolean }) => void
   initialBrand?: string
   initialSearch?: string
   initialBrandData?: any
@@ -25,6 +24,7 @@ export default function SearchFilter({
 }: SearchFilterProps) {
 const [searchQuery, setSearchQuery] = useState(initialSearch)
 const [selectedBrand, setSelectedBrand] = useState<string>(initialBrand)
+const [clear, setClear] = useState(false);
 const [brands, setBrands] = useState<Brand[]>([])
 
   // Load brands from API or use default
@@ -36,7 +36,8 @@ const [brands, setBrands] = useState<Brand[]>([])
   e.preventDefault()
   onSearch({
     searchQuery,
-    selectedBrand, // ← brand ID
+    selectedBrand,
+    clear
   })
 }
 
@@ -45,25 +46,28 @@ const handleBrandChange = (brandId: string) => {
   onSearch({
     searchQuery,
     selectedBrand: brandId,
+    clear
   })
 }
 
 const handleClearFilters = () => {
   setSearchQuery('')
   setSelectedBrand('')
+  setClear(true)
   onSearch({
     searchQuery: '',
     selectedBrand: '',
+    clear
   })
 }
 
 
   return (
-    <div className="bg-white pt-5 pb-3">
+    <div className="bg-white pt-3 pb-3">
       <div className="flex flex-col md:flex-row gap-4 items-center">
         {/* Brand Filter */}
         <div className="flex-1 md:flex-initial">
-          <label className="block text-sm font-medium text-gray-700 mb-1">Filter by Brand</label>
+          <label className="block text-sm font-medium text-gray-500 mb-2">Filter by Brand</label>
           <div className="relative border-1 rounded-lg border-gray-300">
             <select
   value={selectedBrand}
@@ -88,7 +92,7 @@ const handleClearFilters = () => {
 
         {/* Search Input */}
         <div className="flex-1 w-full">
-          <label className="block text-sm font-medium text-gray-700 mb-1">Search Products</label>
+          <label className="block text-sm font-medium text-gray-500 mb-2">Search Products</label>
           <div className="relative">
             <form onSubmit={handleSearch}>
               <input
