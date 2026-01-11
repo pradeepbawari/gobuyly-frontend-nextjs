@@ -66,6 +66,67 @@ export default function OrderSummary() {
     })
   }
 
+  const createOrder = async () => {
+  if (!userData?.user) {
+    router.push("/auth");
+    return;
+  }
+
+  if (!selectedAddress) {
+    setAddressNotFound("Please select a delivery address.");
+    return;
+  }
+
+  try {
+    const selectedProducts = Object.values(cartItems);
+    let referal = localStorage.getItem('referal') || '';
+    const amount = getCartAmountTotal() + shippingCost;
+
+    const orderPayload = {
+      userId: userData?.user?.id,
+      address: selectedAddress,
+      cartItems: selectedProducts,
+      amount,
+      referral: referal,
+      paymentDetails: {
+        razorpay_payment_id: 21212,
+        razorpay_order_id: 455454,
+        razorpay_signature: 6562,
+      },
+      customerName: userData?.user?.name,
+      customerEmail: userData?.user?.email,
+      customerPhone: userData?.user?.mobile_number,
+    };
+
+    const res = await orderPlace(orderPayload);
+    const data = await res;
+
+    if (!data.order_id || !data.payment_session_id) {
+      console.error("Create order failed:", data);
+      alert("Unable to start payment. Try again.");
+      return;
+    }
+
+    const paymentSessionId = data.payment_session_id;
+    console.log("Payment session id:", paymentSessionId);
+	console.log("Payment session id:", process.env.NEXT_PUBLIC_CASHFREE_ENV);
+	
+    // ✅ Proper Cashfree SDK usage
+    const cashfree = await load({
+      mode: process.env.NEXT_PUBLIC_CASHFREE_ENV || "sandbox", // "sandbox" or "production"
+    });
+
+    cashfree.checkout({
+      paymentSessionId,
+      redirectTarget: "_self",
+    });
+
+  } catch (err) {
+    console.error("Payment initiation failed", err);
+    alert("Something went wrong. Please try again.");
+  }
+};
+
   return (
     <div className="bg-white rounded-2xl shadow-sm p-6 sticky top-24">
       <h2 className="text-xl font-semibold mb-4">Order Summary</h2>
@@ -107,7 +168,7 @@ export default function OrderSummary() {
 
       <button
         disabled={disabled}
-        onClick={placeOrder}
+        onClick={createOrder}
         className={`w-full mt-4 py-3 rounded-lg text-white
           ${disabled ? 'bg-gray-300' : 'bg-emerald-500 hover:bg-emerald-600'}`}
       >

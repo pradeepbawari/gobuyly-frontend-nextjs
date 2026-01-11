@@ -2,24 +2,27 @@
 
 import { useState, useEffect } from 'react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { 
-  faListUl, 
-  faChevronRight, 
+import {
+  faListUl,
+  faChevronRight,
   faCircle,
 } from '@fortawesome/free-solid-svg-icons'
 
+/* ---------------- HELPERS ---------------- */
+
+const toSlug = (text: string) =>
+  text.toLowerCase().replace(/[^a-z0-9]+/g, '-')
+
+/* ---------------- TYPES ---------------- */
+
 interface CategoryMenuProps {
-  onCategorySelect?: (categoryId: number | null, categoryName?: string) => void
-  onSubcategorySelect?: (subcategoryId: number, subcategoryName: string) => void
-  initialCategory?:any
+  onSubcategorySelect?: (subcategoryId: number, slugPath: string[]) => void
+  initialCategory?: any
 }
 
 interface Subcategory {
   id: number
   name: string
-  category_id: number
-  parent_id: number | null
-  icon: string
   subcategories: Subcategory[]
 }
 
@@ -29,98 +32,68 @@ interface Category {
   subcategories: Subcategory[]
 }
 
-// Recursive Subcategory Component
 interface SubcategoryItemProps {
   subcategory: Subcategory
   level: number
-  activeCategory: number | null
-  onSelect: (id: number, name: string) => void
+  parentSlugs: string[]
+  onSelect: (id: number, slugPath: string[]) => void
 }
 
-function SubcategoryItem({ subcategory, level, activeCategory, onSelect }: SubcategoryItemProps) {
+/* ---------------- SUBCATEGORY ITEM ---------------- */
+
+function SubcategoryItem({
+  subcategory,
+  level,
+  parentSlugs,
+  onSelect,
+}: SubcategoryItemProps) {
   const [isExpanded, setIsExpanded] = useState(false)
-  const hasChildren = subcategory.subcategories && subcategory.subcategories.length > 0
-
-  // Calculate text size based on level
-  const getTextSize = (level: number) => {
-    if (level === 0) return 'text-[14px] text-green-600'          // First level subcategory
-    if (level === 1) return 'text-[14px]'          // Second level subcategory
-    return 'text-xs font-light'                // Third+ level subcategory (smaller and lighter)
-  }
-
-  // Calculate padding based on level
-  const getPadding = (level: number) => {
-    if (level === 0) return 'p-1.5'
-    if (level === 1) return 'p-1.5 pl-6'
-    return 'p-1'
-  }
-
-  // Calculate icon size based on level
-  const getIconSize = (level: number) => {
-    if (level === 0) return 'text-xs'
-    if (level === 1) return 'text-[10px]'
-    return 'text-[9px]'
-  }
+  const hasChildren =
+    subcategory.subcategories && subcategory.subcategories.length > 0
 
   const handleClick = () => {
+    const currentSlug = toSlug(subcategory.name)
+    const slugPath = [...parentSlugs, currentSlug]
+
     if (hasChildren) {
       setIsExpanded(!isExpanded)
     } else {
-      onSelect(subcategory.id, subcategory.name)
+      onSelect(subcategory.id, slugPath)
     }
   }
 
   return (
-    <div className="rounded-lg overflow-hidden">
+    <div>
       <div
         onClick={handleClick}
-        className={`${getPadding(level)} hover:bg-emerald-50 cursor-pointer transition-all border border-transparent hover:border-emerald-100 flex items-center justify-between group`}
-        style={{ marginLeft: `${level * 16}px` }}
+        className="p-1.5 pl-4 hover:bg-emerald-50 cursor-pointer flex items-center justify-between"
+        style={{ marginLeft: level * 16 }}
       >
         <div className="flex items-center gap-2">
-          {subcategory.icon ? (
-            <div className={`${level === 0 ? 'w-3 h-3' : level === 1 ? 'w-3 h-3' : 'w-3 h-3'} rounded-md overflow-hidden bg-gray-100 flex items-center justify-center`}>
-              <FontAwesomeIcon 
-              icon={hasChildren ? (isExpanded ? faCircle : faCircle) : faCircle} 
-              className={`${getIconSize(level)} ${
-                hasChildren ? 'text-emerald-500' : 'text-emerald-400'
-              }`} 
-            />
-            </div>
-          ) : (
-            <FontAwesomeIcon 
-              icon={hasChildren ? (isExpanded ? faCircle : faCircle) : faCircle} 
-              className={`${getIconSize(level)} ${
-                hasChildren ? 'text-emerald-500' : 'text-emerald-400'
-              }`} 
-            />
-          )}
-          <span className={`${getTextSize(level)} text-gray-700`}>
+          <FontAwesomeIcon icon={faCircle} className="text-emerald-500 text-xs" />
+          <span className="text-sm text-gray-700">
             {subcategory.name}
           </span>
         </div>
+
         {hasChildren && (
           <FontAwesomeIcon
             icon={faChevronRight}
-            className={`text-gray-400 ${getIconSize(level)} transition-transform duration-300 ${
-              isExpanded ? 'rotate-90 text-emerald-600' : ''
+            className={`text-xs transition-transform ${
+              isExpanded ? 'rotate-90' : ''
             }`}
           />
         )}
       </div>
 
-      {hasChildren && (
-        <div
-          className={`overflow-hidden transition-all duration-300 ${
-            isExpanded ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'
-          }`}
-        >
+      {hasChildren && isExpanded && (
+        <div>
           {subcategory.subcategories.map((child) => (
             <SubcategoryItem
               key={child.id}
               subcategory={child}
               level={level + 1}
-              activeCategory={activeCategory}
+              parentSlugs={[...parentSlugs, toSlug(subcategory.name)]}
               onSelect={onSelect}
             />
           ))}
@@ -130,126 +103,51 @@ function SubcategoryItem({ subcategory, level, activeCategory, onSelect }: Subca
   )
 }
 
-export default function CategoryMenu({ onCategorySelect, onSubcategorySelect, initialCategory }: CategoryMenuProps) {
+/* ---------------- CATEGORY MENU ---------------- */
+
+export default function CategoryMenu({
+  onSubcategorySelect,
+  initialCategory,
+}: CategoryMenuProps) {
   const [categories, setCategories] = useState<Category[]>([])
-  const [activeCategory, setActiveCategory] = useState<number | null>(null)
-  const [expandedCategories, setExpandedCategories] = useState<number[]>([])
-  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-  if (initialCategory && initialCategory.length > 0) {
-    setCategories(initialCategory)
-    setLoading(false)
-
-    // Open only the first category
-    const firstCategory = initialCategory[0]
-    setActiveCategory(firstCategory.id)
-    setExpandedCategories([firstCategory.id])
-
-    // Optional: notify parent
-    if (onCategorySelect) {
-      onCategorySelect(firstCategory.id, firstCategory.name)
+    if (initialCategory?.length) {
+      setCategories(initialCategory)
     }
-  } else {
-    setLoading(true)
-  }
-}, [initialCategory])
+  }, [initialCategory])
 
-
-  const handleCategoryClick = (categoryId: number, categoryName?: string) => {
-    if (activeCategory === categoryId) {
-      setActiveCategory(null)
-      setExpandedCategories(prev => prev.filter(id => id !== categoryId))
-      if (onCategorySelect) onCategorySelect(null)
-    } else {
-      setActiveCategory(categoryId)
-      setExpandedCategories(prev => [...prev, categoryId])
-      if (onCategorySelect) onCategorySelect(categoryId, categoryName)
-    }
-  }
-
-  const handleSubcategoryClick = (subcategoryId: number, subcategoryName: string) => {
-    console.log(`Subcategory clicked: ${subcategoryName} (ID: ${subcategoryId})`)
-    if (onSubcategorySelect) {
-      onSubcategorySelect(subcategoryId, subcategoryName)
-    }
-  }
-
-  if (loading) {
-    return (
-      <div className="w-72 bg-white shadow-sm p-6 border border-gray-100 rounded-xl">
-        <div className="animate-pulse space-y-3">
-          <div className="h-6 bg-gray-200 rounded w-3/4"></div>
-          <div className="h-10 bg-gray-200 rounded"></div>
-          <div className="h-10 bg-gray-200 rounded"></div>
-        </div>
-      </div>
-    )
+  const handleSubcategoryClick = (
+    subcategoryId: number,
+    slugPath: string[]
+  ) => {
+    onSubcategorySelect?.(subcategoryId, slugPath)
   }
 
   return (
-    <div className="w-72 bg-white shadow-sm pt-4 pl-3 border border-gray-100 h-[100%]">
-      <h3 className="font-bold text-lg mb-2 text-gray-800 flex items-center gap-2">
-        <FontAwesomeIcon icon={faListUl} className="text-emerald-500" /> 
+    <div className="w-72 bg-white p-6 border-r border-gray-200">
+      <h3 className="font-bold mb-3 flex items-center gap-2">
+        <FontAwesomeIcon icon={faListUl} />
         All Categories
       </h3>
 
-      <div>
-        {categories.map((category) => {
-          const isExpanded = expandedCategories.includes(category.id)
-          const hasSubcategories = category.subcategories && category.subcategories.length > 0
+      {categories.map((category) => (
+        <div key={category.id}>
+          <div className="font-medium text-gray-800 py-2">
+            {category.name}
+          </div>
 
-          return (
-            <div key={category.id} className="rounded-lg overflow-hidden">
-              <div
-                onClick={() => handleCategoryClick(category.id, category.name)}
-                className="pl-0 pb-0 pt-2 pr-3 hover:bg-emerald-50 cursor-pointer transition-all border border-transparent hover:border-emerald-100 flex items-center justify-between group"
-              >
-                <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-lg bg-emerald-100 flex items-center justify-center text-emerald-600">
-                    <span className="text-sm uppercase font-medium">{category.name.charAt(0)}</span>
-                  </div>
-                  <span className="font-medium text-gray-700 text-base">{category.name}</span>
-                </div>
-                {hasSubcategories && (
-                  <FontAwesomeIcon
-                    icon={faChevronRight}
-                    className={`text-gray-400 group-hover:text-emerald-500 text-sm transition-transform duration-300 ${
-                      isExpanded ? 'rotate-90 text-emerald-600' : ''
-                    }`}
-                  />
-                )}
-              </div>
-
-              {hasSubcategories && (
-                <div
-                  className={`overflow-hidden transition-all duration-300 ${
-                    isExpanded ? 'max-h-[2000px] opacity-100' : 'max-h-0 opacity-0'
-                  }`}
-                >
-                  <div className="ml-5 pl-3 border-l-2 border-emerald-100">
-                    {category.subcategories.map((subcategory) => (
-                      <SubcategoryItem
-                        key={subcategory.id}
-                        subcategory={subcategory}
-                        level={0}
-                        activeCategory={activeCategory}
-                        onSelect={handleSubcategoryClick}
-                      />
-                    ))}
-                  </div>
-                </div>
-              )}
-            </div>
-          )
-        })}
-      </div>
-
-      {categories.length === 0 && !loading && (
-        <div className="text-center py-4 text-gray-500">
-          No categories found
+          {category.subcategories.map((subcategory) => (
+            <SubcategoryItem
+              key={subcategory.id}
+              subcategory={subcategory}
+              level={0}
+              parentSlugs={[toSlug(category.name)]}
+              onSelect={handleSubcategoryClick}
+            />
+          ))}
         </div>
-      )}
+      ))}
     </div>
   )
 }

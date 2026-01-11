@@ -1,16 +1,26 @@
 'use client'
 
-import { useAuth } from '@/context/AuthContext.'
+import { useAuth } from '@/context/AuthContext'
 import { useRouter } from 'next/navigation'
+import { useEffect } from 'react'
 
 export default function ProfilePage() {
-  const { user, isAuthenticated, logout } = useAuth()
+  const { user, isAuthenticated, logout, isLoading } = useAuth()
   const router = useRouter()
 
-  if (!isAuthenticated) {
-    router.replace('/login')
-    return null
-  }
+  useEffect(() => {
+      if (!isLoading && !isAuthenticated) {
+        router.replace('/login')
+      }
+    }, [isLoading, isAuthenticated, router])
+  
+    if (isLoading) {
+      return null // or loader
+    }
+  
+    if (!isAuthenticated) {
+      return null
+    }
 
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">

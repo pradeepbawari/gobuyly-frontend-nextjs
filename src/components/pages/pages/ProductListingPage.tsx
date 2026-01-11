@@ -1,0 +1,121 @@
+'use client'
+
+import { useEffect, useState } from 'react'
+import { useRouter } from 'next/navigation'
+import CategoryMenu from '@/components/categories/CategoryMenu'
+import ProductGrid from '@/components/products/ProductGrid'
+import SearchFilter from '@/components/ui/SearchFilter'
+import { getProducts, getsearchProducts, transformProduct } from '@/lib/api'
+import { findCategoryBySlugPath } from '@/lib/slug'
+
+export default function ProductListingPage({
+  categorySlugPath,
+  initialCategories = [],
+  initialBrands = [],
+}: {
+  categorySlugPath?: string
+  initialCategories?: any[]
+  initialBrands?: any[]
+}) {
+  const router = useRouter()
+
+  const [categories] = useState<any[]>(initialCategories)
+  const [brands] = useState<any[]>(initialBrands)
+  const [products, setProducts] = useState<any[]>([])
+  const [loading, setLoading] = useState(false)
+  const [filters, setFilters] = useState<{
+    searchQuery: string
+    selectedBrand: string
+  }>({
+    searchQuery: '',
+    selectedBrand: '',
+  })
+
+  /* Fetch products only */
+  useEffect(() => {
+  const fetchProducts = async () => {
+    try {
+      setLoading(true)
+
+      const hasSearch =
+        !!filters.searchQuery || !!filters.selectedBrand
+
+      // CATEGORY (shared)
+      let categoryId: number | undefined
+      if (categorySlugPath) {
+        const slugs = categorySlugPath.split('/')
+        const category = findCategoryBySlugPath(categories, slugs)
+        categoryId = category?.id
+      }
+
+      let response
+
+      if (hasSearch) {
+        response = await getsearchProducts({
+          searchTerm: filters.searchQuery,
+          searchBrandTerm: filters.selectedBrand,
+        })
+      } else {
+        response = await getProducts({
+          category_id: categoryId,
+        })
+      }
+
+      const mapped =
+        response?.variants?.rows?.map(transformProduct) || []
+
+      setProducts(mapped)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  fetchProducts()
+}, [categorySlugPath, filters])
+
+
+
+  const handleSubcategorySelect = (_id: number, slugPath: string[]) => {
+    router.push(`/${slugPath.join('/')}`)
+  }
+
+  const handleSearch = ({
+    searchQuery,
+    selectedBrand,
+    clear,
+  }: {
+    searchQuery: string
+    selectedBrand: string
+    clear: boolean
+  }) => {
+    setFilters({
+      searchQuery: clear ? '' : searchQuery,
+      selectedBrand: clear ? '' : selectedBrand,
+    })
+  }
+
+
+  return (
+    <div className="flex min-h-[calc(100vh-140px)]">
+      <CategoryMenu
+        initialCategory={categories}
+        onSubcategorySelect={handleSubcategorySelect}
+      />
+
+
+      <div className="flex-1 p-4">
+        {brands.length > 0 && (
+          <SearchFilter
+            onSearch={handleSearch}
+            initialBrand=""
+            initialSearch=""
+            initialBrandData={brands}
+          />
+
+        )}
+
+        <ProductGrid products={products} loading={loading} />
+      </div>
+    </div>
+  )
+}

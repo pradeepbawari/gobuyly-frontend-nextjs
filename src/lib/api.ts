@@ -2,49 +2,44 @@
 const API_URL = 'https://api.gobuyly.com';
 
 // Fetch all categories
-export async function getCategories(): Promise<any> {
+export async function getCategories() {
   try {
-    const response = await fetch(`${API_URL}/api/categories_user/all`);
-    if (!response.ok) throw new Error('Failed to fetch categories');
-    return await response.json();
+    const response = await fetch(`${API_URL}/api/categories_user/all`, {
+      cache: 'no-store'
+    })
+    if (!response.ok) throw new Error('Failed to fetch categories')
+    return await response.json()
   } catch (error) {
-    throw error;
+    console.error(error)
+    return { categories: [] }
   }
 }
 
-// Fetch products with filters
-// Update getProducts function
 export async function getProducts(filters: any = {}) {
   try {
-    console.log('📡 Fetching products with filters:', filters)
-    
     const payload = {
       limit: 20,
       offset: 0,
-      orderBy: [{ sort: "ASC", colId: "price" }],
-      filters: filters
+      orderBy: [{ sort: 'ASC', colId: 'price' }],
+      filters
     }
-    
+
     const response = await fetch(`${API_URL}/api/products_user/filterProductsNew`, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(payload)
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+      cache: 'no-store' // 🔥 Important
     })
-    
-    console.log('📊 Response status:', response.status)
-    
-    if (!response.ok) {
-      throw new Error(`Failed to fetch products: ${response.status}`)
-    }
-    
-    const data = await response.json()
-    return data
+
+    if (!response.ok) throw new Error(`Failed to fetch products: ${response.status}`)
+    return await response.json()
   } catch (error) {
+    console.error(error)
     return { variants: { rows: [] } }
   }
 }
+
+
 export async function getsearchProducts(filters: any = {}) {
   try {
     console.log('📡 Fetching products with filters:', filters)
@@ -227,7 +222,7 @@ export async function getProductById(productId: string) {
 }
 
 // Get products by category
-export async function getProductsByCategory(categoryId: number) {
+export async function getProductsByCategory(categoryId: any) {
   return getProducts({
     category_id: categoryId
   });
@@ -322,6 +317,60 @@ export async function updateUser(form: any) {
         'Authorization': `Bearer ${token}`
       },
       body: JSON.stringify(dataUser),
+    });
+
+    const data = await response.json(); // ✅ ALWAYS parse JSON
+
+    if (!response.ok) {
+      // ✅ send backend error to frontend
+      return { error: data.error };
+    }
+
+    return data;
+  } catch (error: any) {
+    console.error('Register error:', error.message);
+    return { error: 'Something went wrong' };
+  }
+}
+
+export async function createOrder(orderPayload:any){
+  try {
+    const token = localStorage.getItem('token');
+    let userId = localStorage.getItem('user');
+    const response = await fetch(`${API_URL}/api/order_place/new`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify({orderDetails: orderPayload}),
+    });
+
+    const data = await response.json(); // ✅ ALWAYS parse JSON
+
+    if (!response.ok) {
+      // ✅ send backend error to frontend
+      return { error: data.error };
+    }
+
+    return data;
+  } catch (error: any) {
+    console.error('Register error:', error.message);
+    return { error: 'Something went wrong' };
+  }
+}
+
+export async function getOrders(userid:any){
+  try {
+    const token = localStorage.getItem('token');
+    let userId = localStorage.getItem('user');
+    const response = await fetch(`${API_URL}/api/order_place/all`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify({userid: userid}),
     });
 
     const data = await response.json(); // ✅ ALWAYS parse JSON

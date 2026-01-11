@@ -105,7 +105,7 @@ export default function ProductCard({ product = {} }: ProductCardProps) {
   return (
     <>
       <div
-        className="grid grid-cols-[101px_repeat(11,minmax(0,1fr))_40px] items-center gap-5 bg-white px-3 py-2 mb-3
+        className="grid grid-cols-[101px_repeat(10,minmax(0,1fr))_40px] items-center gap-5 bg-white px-3 py-2 mb-3
                  rounded-lg border-b-1 border-gray-200 transition-all duration-200
                  hover:shadow-md hover:border-emerald-500 hover:-translate-y-0.5"
       >
@@ -188,7 +188,7 @@ export default function ProductCard({ product = {} }: ProductCardProps) {
 
         {/* Rest of your existing product card code remains the same */}
         {/* Product Details */}
-        <div className="col-span-5">
+        <div className="col-span-6">
 		<div className="flex justify-between gap-3">
         <h4 className="font-semibold text-gray-800 text-md">
           {/* <span>
@@ -221,14 +221,14 @@ export default function ProductCard({ product = {} }: ProductCardProps) {
         </div>
 
         {/* Stock */}
-        <div className="col-span-2">
+        {/* <div className="col-span-2">
           <span className="stock-badge col-span-2 px-3 py-0.5">
             Stock
           </span>
           <p className="text-gray-500 text-xs mt-1">
             {product.stock || 0} available
           </p>
-        </div>
+        </div> */}
 
         {/* Price */}
         <div className="col-span-1">
@@ -278,7 +278,7 @@ export default function ProductCard({ product = {} }: ProductCardProps) {
           <button
             onClick={handleAddToCart}
             disabled={product.stock <= 0}
-            className="bg-emerald-500 w-full text-white px-4 py-2.5 rounded-lg
+            className="bg-emerald-500 w-full text-white px-4 py-1 rounded-lg
                        font-medium flex items-center justify-center gap-2
                        hover:bg-emerald-600 transition-colors
                        disabled:opacity-50 disabled:cursor-not-allowed"

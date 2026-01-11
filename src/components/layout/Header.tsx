@@ -4,20 +4,20 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faShoppingCart, faHeart, faSignInAlt, faHome, faShoppingBag, faBox, faHeadset, faSignOutAlt, faUserAlt } from '@fortawesome/free-solid-svg-icons'
 import Link from 'next/link'
 import { useCart } from '@/context/CartContext' // ADD THIS IMPORT
-import Image from 'next/image'
-import Logo from '../../../public/gobuyly.png'
 import HeaderPincodeChecker from './HeaderPincodeChecker'
-import { useAuth } from '@/context/AuthContext.'
+import { useAuth } from '@/context/AuthContext'
 
 export default function Header() {
   const { itemCount } = useCart() // GET CART COUNT FROM CONTEXT
   const { user, isAuthenticated, logout } = useAuth()
 
   return (
-    <header className="w-full bg-white shadow-sm px-6 py-4 flex items-center justify-between sticky top-0 z-50">
+    <header className="w-full bg-white shadow-sm px-6 py-2 sticky top-0 z-50">
+      <div className='w-[95%] m-auto flex items-center justify-between'>
       <div className="flex items-center gap-2">
-        <Link href="/" className="flex text-lg text-gray-800">
-          <Image src={Logo} alt='GoBuyly' className='w-12' /> Gobuyly
+        <Link href="/" className="flex text-lg text-gray-800 font-semibold">
+          GoBuyly
+          {/* <span className='text-blue-600'><FontAwesomeIcon icon={faArrow} className="text-sm" /> </span> */}
         </Link>
       </div>
        <div className="relative">
@@ -29,11 +29,11 @@ export default function Header() {
           {/* <FontAwesomeIcon icon={faHome} className="text-sm" />  */}
           Home
         </Link>
-        <Link href="/products" className="hover:text-emerald-600 transition-colors flex items-center gap-1">
-          {/* <FontAwesomeIcon icon={faShoppingBag} className="text-sm" />  */}
+        {/* <Link href="/products" className="hover:text-emerald-600 transition-colors flex items-center gap-1">
+          <FontAwesomeIcon icon={faShoppingBag} className="text-sm" /> 
           Shop
-        </Link>
-        <Link href="/account/orders" className="hover:text-emerald-600 transition-colors flex items-center gap-1">
+        </Link> */}
+        <Link href="/orders" className="hover:text-emerald-600 transition-colors flex items-center gap-1">
           {/* <FontAwesomeIcon icon={faBox} className="text-sm" />  */}
           Orders
         </Link>
@@ -64,6 +64,7 @@ export default function Header() {
             <Link href="/profile" className="rounded-lg">Profile <FontAwesomeIcon icon={faUserAlt} className="mr-2" /></Link>
           </div>
         )}        
+      </div>
       </div>
       </div>
     </header>

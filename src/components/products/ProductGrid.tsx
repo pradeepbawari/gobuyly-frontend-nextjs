@@ -10,7 +10,7 @@ interface ProductGridProps {
 
 export default function ProductGrid({ products = [], loading = false }: ProductGridProps) {
   const [currentPage, setCurrentPage] = useState(1)
-  const itemsPerPage = 6
+  const itemsPerPage = 15
 
   if (loading) {
     return (
@@ -80,7 +80,7 @@ export default function ProductGrid({ products = [], loading = false }: ProductG
 
       {/* Pagination - EXACT MOCKUP STYLE */}
       {totalPages > 1 && (
-        <div className="flex justify-between items-center mt-8 pt-6 border-t border-gray-200">
+        <div className="flex justify-between items-center mt-6 pb-3 ">
           <div className="text-sm text-gray-500">
             Showing <span className="font-medium text-gray-700">
               {startIndex + 1}-{Math.min(startIndex + itemsPerPage, safeProducts.length)}
