@@ -17,7 +17,7 @@ export default function CartPage() {
   const router = useRouter()
 
   const [addressChange, setAddressChange] = useState(false)
-  const [pincode, setPincode] = useState<string | number>(user?.pincode || 0)
+  const [pincode, setPincode] = useState<string | number | null>(user?.pincode ?? null)
   const [error, setError] = useState('')
 
   const [form, setForm] = useState({
@@ -62,15 +62,16 @@ export default function CartPage() {
   }
 
   const handlePincodeChange = (data: {
-    pincode: string | null
-    isValid: boolean | null
-  }) => {
-    if (data?.isValid === false) {
-      setPincode('000000')
-    } else {
-      setPincode(data?.pincode)
-    }
+  pincode: string | null
+  isValid: boolean | null
+}) => {
+  if (data?.isValid === false || !data?.pincode) {
+    setPincode('000000')
+  } else {
+    setPincode(data.pincode)
   }
+}
+
 
   /* ---------------- CREATE ORDER ---------------- */
 
