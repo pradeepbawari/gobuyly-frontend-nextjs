@@ -4,7 +4,6 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faShoppingCart, faHeart, faSignInAlt, faHome, faShoppingBag, faBox, faHeadset, faSignOutAlt, faUserAlt } from '@fortawesome/free-solid-svg-icons'
 import Link from 'next/link'
 import { useCart } from '@/context/CartContext' // ADD THIS IMPORT
-import HeaderPincodeChecker from './HeaderPincodeChecker'
 import { useAuth } from '@/context/AuthContext'
 
 export default function Header() {
@@ -20,9 +19,9 @@ export default function Header() {
           {/* <span className='text-blue-600'><FontAwesomeIcon icon={faArrow} className="text-sm" /> </span> */}
         </Link>
       </div>
-       <div className="relative">
-            <HeaderPincodeChecker />
-        </div>
+       {/* <div className="relative">
+            pincode components
+        </div> */}
 
       <nav className="hidden md:flex gap-8 font-normal text-gray-700">
         <Link href="/" className="hover:text-emerald-600 transition-colors flex items-center gap-1">
