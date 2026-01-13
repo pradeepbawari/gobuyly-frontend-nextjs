@@ -10,6 +10,7 @@ import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 import { updateUser, createOrder } from '@/lib/api'
 import HeaderPincodeChecker from '@/components/layout/HeaderPincodeChecker'
+import OrderSummary from '@/components/orderSummary/OrderSummary'
 
 export default function CartPage() {
   const { cart, total, removeFromCart, updateQuantity, clearCart } = useCart()
@@ -239,7 +240,8 @@ export default function CartPage() {
 
         {/* Summary */}
         <div className="bg-white rounded-2xl shadow-sm p-6 sticky top-24">
-          <h2 className="text-xl font-semibold mb-6">Order Summary</h2>
+          <OrderSummary />
+          {/* <h2 className="text-xl font-semibold mb-6">Order Summary</h2>
 
           <p>
             Shipping Address: <span>{user?.address}</span>
@@ -292,7 +294,7 @@ export default function CartPage() {
             className="w-full bg-emerald-500 text-white py-3 rounded-lg mt-6"
           >
             Proceed to Checkout
-          </button>
+          </button> */}
         </div>
       </div>
     </div>

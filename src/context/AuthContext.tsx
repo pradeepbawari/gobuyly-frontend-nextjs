@@ -7,7 +7,7 @@ interface User {
   name: string
   email: string
   avatar?: string
-  address?: string
+  address?: any
   mobile_number?: number
   gst?: any
   pincode: number
@@ -28,8 +28,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
-    const savedUser = localStorage.getItem('user')
-    if (savedUser) {
+    const savedUser:any = localStorage.getItem('user')
+    if (savedUser !== "undefined") {
       setUser(JSON.parse(savedUser))
     }
     setIsLoading(false)

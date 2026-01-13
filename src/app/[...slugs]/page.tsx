@@ -8,7 +8,6 @@ export default async function RootCategoryPage({
 }) {
   const resolvedParams = await params;  // unwrap the promise
   const slugPath = resolvedParams.slugs?.join('/') ?? '';
-
   const [categoriesRes, brandsRes] = await Promise.all([
     getCachedCategories(),
     getCachedBrands(),

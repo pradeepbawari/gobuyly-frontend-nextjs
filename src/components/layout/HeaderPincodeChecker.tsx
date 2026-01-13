@@ -1,146 +1,80 @@
 'use client'
 
-import { ChangeEvent, useEffect, useState, useCallback } from 'react'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faMapMarkerAlt, faCheck, faTimes } from '@fortawesome/free-solid-svg-icons'
+import { useState } from 'react'
 
-const ALLOWED_PINCODES = new Set([
-  '110001', '110097',
-])
+const ALLOWED_PINCODES = new Set(['110001', '110097'])
 
-/* ---------- Types ---------- */
-export type PincodeStatus = {
-  pincode: string | null
-  isValid: boolean | null
+export type PincodeResult = {
+  pincode: string
+  valid: boolean
 }
 
-type Props = {
-  onChange?: (data: PincodeStatus) => void
-}
-
-/* ---------- Component ---------- */
-export default function HeaderPincodeChecker({ onChange }: Props) {
+export default function HeaderPincodeChecker({
+  onResult,
+}: {
+  onResult: (result: PincodeResult) => void
+}) {
   const [input, setInput] = useState('')
-  const [status, setStatus] = useState<PincodeStatus>({
-    pincode: null,
-    isValid: null,
-  })
+  const [checked, setChecked] = useState(false)
   const [loading, setLoading] = useState(false)
+  const [isValid, setIsValid] = useState<boolean | null>(null)
 
-  /* ---------- Init from localStorage ---------- */
-  useEffect(() => {
-    const stored = localStorage.getItem('userPincode')
-    if (stored) {
-      const initStatus = { pincode: stored, isValid: true }
-      setStatus(initStatus)
-      onChange?.(initStatus)
-    }
-  }, [onChange])
-
-  /* ---------- Helpers ---------- */
-  const updateStatus = useCallback(
-    (data: PincodeStatus) => {
-      setStatus(data)
-      onChange?.(data)
-    },
-    [onChange]
-  )
-
-  const validatePincode = useCallback(() => {
-    if (input.length !== 6) {
-      updateStatus({ pincode: null, isValid: false })
-      return
-    }
-
+  const checkPincode = () => {
+    setChecked(true)
     setLoading(true)
 
     setTimeout(() => {
-      const isValid = ALLOWED_PINCODES.has(input)
+      const valid = ALLOWED_PINCODES.has(input)
 
-      if (isValid) {
-        localStorage.setItem('userPincode', input)
-        updateStatus({ pincode: input, isValid: true })
+      setIsValid(valid)
+      onResult({ pincode: input, valid })
+
+      if (valid) {
+        localStorage.setItem('delivery_pincode', input)
       } else {
-        updateStatus({ pincode: null, isValid: false })
+        localStorage.removeItem('delivery_pincode')
       }
 
       setLoading(false)
-    }, 400)
-  }, [input, updateStatus])
-
-  const clearPincode = () => {
-    localStorage.removeItem('userPincode')
-    setInput('')
-    updateStatus({ pincode: null, isValid: null })
+    }, 300)
   }
 
-  const onInputChange = (e: ChangeEvent<HTMLInputElement>) => {
-    setInput(e.target.value.replace(/\D/g, '').slice(0, 6))
-  }
-
-  /* ---------- UI ---------- */
   return (
-    <div className="relative">
-      {status.pincode ? (
-        /* ----- Saved View ----- */
-        <div className="flex items-center gap-2">
-          <FontAwesomeIcon icon={faMapMarkerAlt} className="text-red-500 text-sm" />
-          <div>
-            <span className="text-xs text-gray-500">Deliver to</span>
-            <div className="flex items-center gap-2">
-              <span className="text-sm font-medium">{status.pincode}</span>
-              <button
-                onClick={clearPincode}
-                className="text-xs text-gray-500 hover:text-red-500"
-              >
-                Change
-              </button>
-            </div>
-          </div>
-        </div>
-      ) : (
-        /* ----- Input View ----- */
-        <div>
-          <div className="flex items-center border rounded-md overflow-hidden">
-            <span className="px-3 text-gray-400">
-              <FontAwesomeIcon icon={faMapMarkerAlt} />
-            </span>
+    <div>
+      <div className="flex gap-2">
+        <input
+          value={input}
+          maxLength={6}
+          onChange={(e) => {
+            setInput(e.target.value.replace(/\D/g, ''))
+            setChecked(false)
+            setIsValid(null)
+          }}
+          placeholder="Enter pincode"
+          className="border px-2 py-1"
+        />
 
-            <input
-              value={input}
-              onChange={onInputChange}
-              placeholder="Enter pincode"
-              className="w-28 px-2 py-1.5 text-sm outline-none"
-              maxLength={6}
-            />
+        <button
+          disabled={input.length !== 6 || loading}
+          onClick={checkPincode}
+          className="bg-green-600 text-white px-3 disabled:opacity-50"
+        >
+          {loading ? 'Checking…' : 'Check'}
+        </button>
+      </div>
 
-            <button
-              onClick={validatePincode}
-              disabled={loading || input.length !== 6}
-              className="px-3 py-1.5 bg-emerald-500 text-white text-sm
-                         disabled:opacity-50 hover:bg-emerald-600"
-            >
-              {loading ? 'Checking…' : 'Check'}
-            </button>
-          </div>
+      {/* ✅ Error shown ONLY when invalid */}
+      {checked && !loading && isValid === false && (
+        <p className="text-sm mt-1 text-red-600">
+          Delivery not available at this location
+        </p>
+      )}
 
-          {/* ----- Status Message ----- */}
-          {status.isValid !== null && (
-            <div className="mt-1 text-xs flex items-center gap-1">
-              {status.isValid ? (
-                <span className="text-emerald-600 flex items-center gap-1">
-                  <FontAwesomeIcon icon={faCheck} />
-                  Delivery available
-                </span>
-              ) : (
-                <span className="text-red-600 flex items-center gap-1">
-                  <FontAwesomeIcon icon={faTimes} />
-                  Delivery not available
-                </span>
-              )}
-            </div>
-          )}
-        </div>
+      {/* ✅ Optional success feedback */}
+      {checked && !loading && isValid === true && (
+        <p className="text-sm mt-1 text-green-600">
+          Delivery available
+        </p>
       )}
     </div>
   )

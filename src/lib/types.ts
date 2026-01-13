@@ -36,3 +36,12 @@ export interface CartItem {
   product: Product;
   quantity: number;
 }
+
+export interface Address {
+  fullName: string
+  phoneNumber: string
+  pincode: string
+  area: string
+  city: string
+  state: string
+}

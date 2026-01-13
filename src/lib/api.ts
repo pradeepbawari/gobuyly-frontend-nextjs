@@ -433,3 +433,27 @@ export async function brandList() {
     return { error: 'Something went wrong' };
   }
 }
+
+export const updateUserAddress = async (formData:any) => {
+    try {
+        const token = localStorage.getItem('token');
+        const response = await fetch(`${API_URL}/api/users/updatenew`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify(formData)
+        })
+        const data = await response.json(); // ✅ ALWAYS parse JSON
+    if (!response.ok) {
+      // ✅ send backend error to frontend
+      return { error: data.error };
+    }
+
+    return data;
+  } catch (error: any) {
+    console.error('Register error:', error.message);
+    return { error: 'Something went wrong' };
+  }
+};
