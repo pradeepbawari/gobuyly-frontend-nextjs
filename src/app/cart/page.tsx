@@ -175,7 +175,7 @@ export default function CartPage() {
                     {item.product.image ? (
                       <Image
                         src={item.product.image}
-                        alt={item.product.name}
+                        alt={item.product.name || 'cart image'}
                         fill
                         className="object-cover rounded-lg"
                         unoptimized
