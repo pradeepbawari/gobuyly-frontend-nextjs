@@ -44,10 +44,10 @@ const OrderSummary = () => {
   useEffect(() => {
     if (!selectedAddress) return
 
-    if (total >= 750) {
+    if (total >= 2000) {
       setShippingCost(0)
     } else {
-      setShippingCost(50)
+      setShippingCost(250)
     }
   }, [total, selectedAddress])
 
@@ -106,11 +106,13 @@ const OrderSummary = () => {
           quantity: item.quantity,
           price: item.product.price,
           sku: item.product.sku,
+          gst: item.product.gst_rate
         })),
         subtotal: total,
         tax: Number((total * 0.18).toFixed(2)),
         shipping: shippingCost,
-        amount: Number((total + shippingCost + total * 0.18).toFixed(2)),
+        // amount: Number((total + shippingCost + total).toFixed(2)),
+        amount: total,
         address: selectedAddress,
         pincode: selectedAddress.pincode,
       }
@@ -160,7 +162,7 @@ const OrderSummary = () => {
         >
           <p className="text-sm text-gray-700">
             {selectedAddress
-              ? `${selectedAddress.name}, ${selectedAddress.area}, ${selectedAddress.city}, ${selectedAddress.state}`
+              ? `${selectedAddress?.name}, ${selectedAddress.area}, ${selectedAddress.city}, ${selectedAddress.state}`
               : 'Select Address'}
           </p>
           <span className="text-gray-500">⌄</span>
@@ -175,7 +177,7 @@ const OrderSummary = () => {
                 onClick={() => handleSelectAddress(addr)}
                 className="p-3 text-sm cursor-pointer hover:bg-gray-100 border-b last:border-b-0"
               >
-                <p className="font-medium">{addr.fullName}</p>
+                <p className="font-medium">{addr.name}</p>
                 <p>{addr.area}, {addr.city}</p>
                 <p>{addr.state}, {addr.pincode}</p>
               </div>
@@ -217,7 +219,7 @@ const OrderSummary = () => {
         </div>
 
         <div className="flex justify-between font-medium text-lg border-t pt-2">
-          <span>Total</span>
+          <span>Total + GST</span>
           <span>₹{total + shippingCost}</span>
         </div>
       </div>

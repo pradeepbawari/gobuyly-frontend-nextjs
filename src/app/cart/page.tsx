@@ -188,7 +188,7 @@ export default function CartPage() {
                   </div>
 
                   <div className="flex-1">
-                    <h3 className="font-semibold text-gray-800">{item.product.name}</h3>
+                    <h3 className="font-semibold text-gray-800">{item.product.displayTitle}</h3>
                     <p className="text-gray-600 text-xs mb-2">
                       SKU - {item.product.sku}
                     </p>

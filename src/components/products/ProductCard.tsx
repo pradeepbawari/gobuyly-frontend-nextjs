@@ -38,7 +38,6 @@ export default function ProductCard({ product = {} }: ProductCardProps) {
       </div>
     )
   }
-
   const price = parseFloat(product.price) || 0
   const salePrice = parseFloat(product.sale_price) || 0
   const finalPrice = salePrice > 0 ? salePrice : price

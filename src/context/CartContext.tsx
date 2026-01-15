@@ -10,6 +10,8 @@ interface Product {
   price: number
   image?: string
   stock: number
+  displayTitle: string
+  gst_rate:number
 }
 
 interface CartItem {
@@ -63,7 +65,15 @@ export function CartProvider({ children }: { children: ReactNode }) {
   }, [cart])
 
   const updateTotals = (items: CartItem[]) => {
-    const totalAmount = items.reduce((sum, item) => sum + (item.product.price * item.quantity), 0)
+    // const totalAmount = items.reduce((sum, item) => sum + ((item.product.price * item.quantity) * item.product?.gst_rate), 0)
+    const totalAmount = items.reduce((sum, item) => {
+  const gstRate = Number(item.product.gst_rate); // "18.00"
+  const basePrice = item.product.price * item.quantity;
+  const totalWithGst = basePrice + (basePrice * gstRate) / 100;
+
+  return sum + totalWithGst;
+}, 0);
+
     const totalItems = items.reduce((sum, item) => sum + item.quantity, 0)
     
     setTotal(totalAmount)
@@ -90,10 +100,11 @@ export function CartProvider({ children }: { children: ReactNode }) {
           {product: {
               id: product.id,
               sku: product.sku || `Product ${product.id}`,
-              name: `${product?.product_name} ${product?.title?.size} ${product?.title?.materials} ${product?.title?.color_id !== "No Colour" ? product?.title?.color_id : ''}`,
+              displayTitle: `${product?.displayTitle}`,
               price: parseFloat(product.price) || 0,
               image: product.primary_image?.image_url || product.image,
-              stock: product.stock || 10
+              stock: product.stock || 10,
+              gst_rate: product.gst_rate
             },
             quantity
           }

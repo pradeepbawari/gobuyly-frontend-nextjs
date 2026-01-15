@@ -108,7 +108,7 @@ const Orders = () => {
                 <div className="text-sm text-gray-600 pt-2">
                   {/* <p>Order ID: {order.paymentDetails.razorpay_order_id}</p> */}
                   {/* <p>Signature: {order.paymentDetails.razorpay_signature}</p> */}
-                  <p className="text-sm text-gray-600 text-right pr-5 font-bold">Total: ₹{order.amount}</p>
+                  <p className="text-sm text-gray-600 text-right pr-5 font-bold">Total: ₹{order.amount + (order?.shipping || 0)}</p>
                 </div>
               </div>
             ))}
