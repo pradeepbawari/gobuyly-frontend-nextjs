@@ -194,6 +194,7 @@ export function transformProduct(apiProduct: any) {
     stock: apiProduct.stock,
     sku: apiProduct.sku,
     size: apiProduct.size,
+    gst_rate: apiProduct?.product?.gst_rate,
     title: apiProduct.title,
     displayTitle: apiProduct.displayTitle,
     images: apiProduct.images || [],
