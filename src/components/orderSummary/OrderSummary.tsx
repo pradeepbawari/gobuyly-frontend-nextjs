@@ -205,7 +205,7 @@ const OrderSummary = () => {
       {/* ---------------- Price Breakdown ---------------- */}
       <div className="space-y-2 text-sm">
         <div className="flex justify-between">
-          <span>Items ({itemCount})</span>
+          <span>Items+GST ({itemCount})</span>
           <span>₹{total}</span>
         </div>
 
@@ -219,7 +219,7 @@ const OrderSummary = () => {
         </div>
 
         <div className="flex justify-between font-medium text-lg border-t pt-2">
-          <span>Total + GST</span>
+          <span>Total + GST + Shipping</span>
           <span>₹{total + shippingCost}</span>
         </div>
       </div>
