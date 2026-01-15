@@ -6,12 +6,12 @@ import { createContext, useContext, useState, useEffect, ReactNode } from 'react
 interface Product {
   id: number
   sku: string
-  name: string
+  name?: string
   price: number
   image?: string
   stock: number
   displayTitle: string
-  gst_rate:number
+  gst_rate:number  
 }
 
 interface CartItem {
