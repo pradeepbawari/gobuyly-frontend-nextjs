@@ -15,27 +15,76 @@ export async function getCategories() {
   }
 }
 
-export async function getProducts(filters: any = {}) {
+// export async function getProducts(filters: any = {}) {
+//   try {
+//     const payload = {
+//       limit: 20,
+//       offset: 0,
+//       orderBy: [{ sort: 'ASC', colId: 'price' }],
+//       filters
+//     }
+
+//     const response = await fetch(`${API_URL}/api/products_user/filterProductsNew`, {
+//       method: 'POST',
+//       headers: { 'Content-Type': 'application/json' },
+//       body: JSON.stringify(payload),
+//       cache: 'no-store' // 🔥 Important
+//     })
+
+//     if (!response.ok) throw new Error(`Failed to fetch products: ${response.status}`)
+//     return await response.json()
+//   } catch (error) {
+//     console.error(error)
+//     return { variants: { rows: [] } }
+//   }
+// }
+
+
+export async function getProducts({
+  filters = {},
+  page = 1,
+  limit = 20,
+  orderBy = [{ sort: 'ASC', colId: 'price' }],
+}: {
+  filters?: any
+  page?: number
+  limit?: number
+  orderBy?: { sort: 'ASC' | 'DESC'; colId: string }[]
+}) {
   try {
+    const offset = (page - 1) * limit
+
     const payload = {
-      limit: 20,
-      offset: 0,
-      orderBy: [{ sort: 'ASC', colId: 'price' }],
-      filters
+      limit,
+      offset,
+      orderBy,
+      filters,
     }
 
-    const response = await fetch(`${API_URL}/api/products_user/filterProductsNew`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload),
-      cache: 'no-store' // 🔥 Important
-    })
+    const response = await fetch(
+      `${API_URL}/api/products_user/filterProductsNew`,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+        cache: 'no-store', // ✅ correct
+      }
+    )
 
-    if (!response.ok) throw new Error(`Failed to fetch products: ${response.status}`)
+    if (!response.ok) {
+      throw new Error(`Failed to fetch products: ${response.status}`)
+    }
+
     return await response.json()
   } catch (error) {
-    console.error(error)
-    return { variants: { rows: [] } }
+    console.error('getProducts error:', error)
+
+    return {
+      variants: {
+        rows: [],
+        count: 0, // ⚠️ REQUIRED for pagination
+      },
+    }
   }
 }
 
