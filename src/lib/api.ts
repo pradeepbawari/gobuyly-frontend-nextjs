@@ -277,12 +277,12 @@ export async function getProductById(productId: string) {
   }
 }
 
-// Get products by category
-export async function getProductsByCategory(categoryId: any) {
-  return getProducts({
-    category_id: categoryId
-  });
-}
+// // Get products by category
+// export async function getProductsByCategory(categoryId: any) {
+//   return getProducts({
+//     category_id: categoryId
+//   });
+// }
 
 // Get products with pagination
 export async function getProductsWithPagination(limit: number = 50, offset: number = 0, filters: any = {}) {
