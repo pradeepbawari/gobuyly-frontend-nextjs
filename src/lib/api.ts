@@ -40,13 +40,20 @@ export async function getCategories() {
 // }
 
 
+type ProductFilters = {
+  category_id?: number
+  subcategory_id?: number
+  brand?: string
+  search?: string
+}
+
 export async function getProducts({
   filters = {},
   page = 1,
   limit = 20,
   orderBy = [{ sort: 'ASC', colId: 'price' }],
 }: {
-  filters?: any
+  filters?: ProductFilters
   page?: number
   limit?: number
   orderBy?: { sort: 'ASC' | 'DESC'; colId: string }[]
@@ -87,7 +94,6 @@ export async function getProducts({
     }
   }
 }
-
 
 export async function getsearchProducts(filters: any = {}) {
   try {

@@ -57,19 +57,22 @@ export default function ProductListingPage({
         let response
 
         if (hasSearch) {
-          response = await getsearchProducts({
-            searchTerm: filters.searchQuery,
-            searchBrandTerm: filters.selectedBrand,
-            page,
-            limit,
-          })
-        } else {
-          response = await getProducts({
-            category_id: categoryId,
-            page,
-            limit,
-          })
-        }
+  response = await getsearchProducts({
+    searchTerm: filters.searchQuery,
+    searchBrandTerm: filters.selectedBrand,
+    page,
+    limit,
+  })
+} else {
+  response = await getProducts({
+    filters: {
+      category_id: categoryId,
+    },
+    page,
+    limit,
+  })
+}
+
 
         setProducts(
           response?.variants?.rows?.map(transformProduct) || []
