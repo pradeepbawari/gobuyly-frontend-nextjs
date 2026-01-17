@@ -2,28 +2,43 @@
 
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
+
 import CategoryMenu from '@/components/categories/CategoryMenu'
 import ProductGrid from '@/components/products/ProductGrid'
 import SearchFilter from '@/components/ui/SearchFilter'
-import { getProducts, getsearchProducts, transformProduct } from '@/lib/api'
-import { findCategoryBySlugPath } from '@/lib/slug'
 import ProductPanelLoader from '@/components/products/ProductPanelLoader'
+
+import {
+  getProducts,
+  getsearchProducts,
+  transformProduct,
+} from '@/lib/api'
+
+import { findCategoryBySlugPath } from '@/lib/slug'
+
+/* ===================== TYPES ===================== */
+
+interface ProductListingPageProps {
+  categorySlugPath?: string
+  initialCategories?: any[]
+  initialBrands?: any[]
+}
+
+/* ===================== COMPONENT ===================== */
 
 export default function ProductListingPage({
   categorySlugPath,
   initialCategories = [],
   initialBrands = [],
-}: {
-  categorySlugPath?: string
-  initialCategories?: any[]
-  initialBrands?: any[]
-}) {
+}: ProductListingPageProps) {
   const router = useRouter()
 
+  /* ---------- STATE ---------- */
+
   const [products, setProducts] = useState<any[]>([])
-  const [loading, setLoading] = useState(false)
-  const [page, setPage] = useState(1)
-  const [total, setTotal] = useState(0)
+  const [loading, setLoading] = useState<boolean>(false)
+  const [page, setPage] = useState<number>(1)
+  const [total, setTotal] = useState<number>(0)
 
   const limit = 15
 
@@ -32,22 +47,25 @@ export default function ProductListingPage({
     selectedBrand: '',
   })
 
-  /* Reset page on filter or category change */
+  /* ---------- RESET PAGE ON CHANGE ---------- */
+
   useEffect(() => {
     setPage(1)
   }, [filters, categorySlugPath])
 
-  /* Fetch products */
+  /* ---------- FETCH PRODUCTS ---------- */
+
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        setLoading(true)
-
         let categoryId: number | undefined
 
         if (categorySlugPath) {
           const slugs = categorySlugPath.split('/')
-          const category = findCategoryBySlugPath(initialCategories, slugs)
+          const category = findCategoryBySlugPath(
+            initialCategories,
+            slugs
+          )
           categoryId = category?.id
         }
 
@@ -57,54 +75,70 @@ export default function ProductListingPage({
         let response
 
         if (hasSearch) {
-  response = await getsearchProducts({
-    searchTerm: filters.searchQuery,
-    searchBrandTerm: filters.selectedBrand,
-    page,
-    limit,
-  })
-} else {
-  response = await getProducts({
-    filters: {
-      category_id: categoryId,
-    },
-    page,
-    limit,
-  })
-}
-
+          response = await getsearchProducts({
+            searchTerm: filters.searchQuery,
+            searchBrandTerm: filters.selectedBrand,
+            page,
+            limit,
+          })
+        } else {
+          response = await getProducts({
+            filters: {
+              category_id: categoryId,
+            },
+            page,
+            limit,
+          })
+        }
 
         setProducts(
           response?.variants?.rows?.map(transformProduct) || []
         )
+
         setTotal(response?.variants?.count || 0)
+      } catch (error) {
+        console.error('Failed to fetch products:', error)
       } finally {
-        setLoading(false)
+        setLoading(false) // ✅ stop loader ONLY after data arrives
       }
     }
 
     fetchProducts()
   }, [categorySlugPath, filters, page])
 
+  /* ---------- HANDLERS ---------- */
+
   const handleSearch = ({
     searchQuery,
     selectedBrand,
     clear,
   }: any) => {
+    setLoading(true)
     setFilters({
       searchQuery: clear ? '' : searchQuery,
       selectedBrand: clear ? '' : selectedBrand,
     })
   }
 
+  const handleCategoryNavigate = (slugPath: string[]) => {
+    setLoading(true) // 🔥 loader starts immediately
+    router.push(`/${slugPath.join('/')}`)
+  }
+
+  /* ---------- RENDER ---------- */
+
   return (
     <div className="flex">
+      {/* -------- LEFT CATEGORY MENU -------- */}
+
       <CategoryMenu
         initialCategory={initialCategories}
         onSubcategorySelect={(_, slugPath) =>
-          router.push(`/${slugPath.join('/')}`)
+          handleCategoryNavigate(slugPath)
         }
       />
+
+      {/* -------- RIGHT PRODUCT PANEL -------- */}
 
       <div className="flex-1 p-4">
         <SearchFilter
@@ -114,27 +148,21 @@ export default function ProductListingPage({
           initialBrandData={initialBrands}
         />
 
-        {/* <ProductGrid
-          products={products}
-          loading={loading}
-          page={page}
-          total={total}
-          limit={limit}
-          onPageChange={setPage}
-        /> */}
         <div className="relative min-h-[500px]">
-  {loading && <ProductPanelLoader />}
+          {loading && <ProductPanelLoader />}
 
-  <ProductGrid
-    products={products}
-    loading={false}
-    page={page}
-    total={total}
-    limit={limit}
-    onPageChange={setPage}
-  />
-</div>
-
+          <ProductGrid
+            products={products}
+            loading={false}
+            page={page}
+            total={total}
+            limit={limit}
+            onPageChange={(p) => {
+              setLoading(true)
+              setPage(p)
+            }}
+          />
+        </div>
       </div>
     </div>
   )
