@@ -52,7 +52,7 @@ const AddressForm = ({ value, onChange, page }: Props) => {
       addr.area.trim() !== '' &&
       addr.city.trim() !== '' &&
       addr.state.trim() !== '' &&
-      addr.pincode.trim() !== ''
+      page === 'register' ? addr.pincode.trim() !== '' : addr.pincode.trim() !== ''
     )
   }
 
@@ -123,7 +123,22 @@ const AddressForm = ({ value, onChange, page }: Props) => {
           />
         </div>
 
-        <HeaderPincodeChecker onResult={handlePincode} />
+        {/* REGISTER PAGE → manual pincode input */}
+{page === 'register' && (
+  <input
+    required
+    maxLength={6}
+    className="px-2 py-2.5 border rounded w-full"
+    placeholder="Pincode"
+    value={value.pincode}
+    onChange={(e) => handleInputChange('pincode', e.target.value)}
+  />
+)}
+
+{/* OTHER PAGES → pincode checker */}
+{page !== 'register' && (
+  <HeaderPincodeChecker onResult={handlePincode} />
+)}
       </div>
     </form>
   )

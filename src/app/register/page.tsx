@@ -64,7 +64,7 @@ export default function RegisterPage() {
 
   return (
     <div className="max-w-md mx-auto p-6">
-      <h1 className="text-xl font-semibold mb-4">Add New Address</h1>
+      <h1 className="text-xl font-semibold mb-4">New Registration</h1>
 
       <AddressForm value={address} onChange={handleAddressChange} page='register' />
 

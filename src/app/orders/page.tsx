@@ -54,7 +54,7 @@ const Orders = () => {
       )}
 
       {orders.map(order => (
-        <div key={order.id} className="bg-white shadow rounded-xl p-4 space-y-4">
+        <div key={order.id} className="bg-white border border-gray-400 rounded-xl p-4 space-y-4">
 
           {/* Order Header */}
           <div className="flex justify-between">
@@ -87,7 +87,7 @@ const Orders = () => {
               return (
                 <div
                   key={item.id}
-                  className="flex gap-4 border rounded-lg p-3 bg-gray-50"
+                  className="flex gap-4 border border-gray-300 rounded-lg p-3 bg-gray-50"
                 >
                   {/* Product Image */}
                   <Image
@@ -101,7 +101,7 @@ const Orders = () => {
                   {/* Item Details */}
                   <div className="flex-1 text-sm">
                     <p className="font-semibold text-gray-800">
-                      {item.variantOrder.product.name}
+                      {item.variantOrder?.displayTitle}
                     </p>
                     <p className="text-gray-500">
                       {item.variantOrder.size}
@@ -122,8 +122,10 @@ const Orders = () => {
           </div>
 
           {/* Total Amount */}
-          <div className="text-right font-bold text-gray-800 pt-2">
-            Total: ₹{order.amount + (order.shipping || 0)}
+          <div className="text-right font-semibold text-gray-800 pt-2 text-sm">
+            <p>Shipping: <span className='text-green-600'>₹ {order.shipping || 0}</span></p>
+            <p>Total: <span className='text-green-600'>₹ {order.amount}</span></p>
+            <p>Subtotal: <span className='text-green-600'>₹{order.amount + (order.shipping || 0)}</span></p>
           </div>
         </div>
       ))}
