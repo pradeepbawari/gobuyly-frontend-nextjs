@@ -126,15 +126,15 @@ export async function getsearchProducts(filters: any = {}) {
   }
 }
 
-// Add a new function for subcategory filtering
-export async function getProductsBySubcategory(subcategoryId: number) {
-  return getProducts({
-    category_id: subcategoryId // Adjust based on your API
-    // OR if your API uses different field names:
-    // subcategory_id: subcategoryId,
-    // parent_id: subcategoryId
-  })
-}
+// // Add a new function for subcategory filtering
+// export async function getProductsBySubcategory(subcategoryId: number) {
+//   return getProducts({
+//     category_id: subcategoryId // Adjust based on your API
+//     // OR if your API uses different field names:
+//     // subcategory_id: subcategoryId,
+//     // parent_id: subcategoryId
+//   })
+// }
 
 // Search products by keyword
 export async function searchProducts(searchTerm: string, filters: any = {}) {
