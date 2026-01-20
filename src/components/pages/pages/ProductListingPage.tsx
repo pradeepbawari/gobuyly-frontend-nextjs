@@ -39,6 +39,7 @@ export default function ProductListingPage({
   const [loading, setLoading] = useState<boolean>(false)
   const [page, setPage] = useState<number>(1)
   const [total, setTotal] = useState<number>(0)
+  const [isCategoryMenuOpen, setIsCategoryMenuOpen] = useState(false)
 
   const limit = 15
 
@@ -122,25 +123,61 @@ export default function ProductListingPage({
 
   const handleCategoryNavigate = (slugPath: string[]) => {
     setLoading(true) // 🔥 loader starts immediately
+    setIsCategoryMenuOpen(false)
     router.push(`/${slugPath.join('/')}`)
   }
 
   /* ---------- RENDER ---------- */
 
   return (
-    <div className="flex">
-      {/* -------- LEFT CATEGORY MENU -------- */}
+    <div className="flex flex-col lg:flex-row min-h-screen">
+      {/* Mobile Category Menu Toggle */}
+      <div className="lg:hidden border-b border-gray-200 bg-white">
+        <button
+          onClick={() => setIsCategoryMenuOpen(!isCategoryMenuOpen)}
+          className="w-full px-4 py-3 flex items-center justify-between text-gray-700 font-medium"
+        >
+          <span className="flex items-center gap-2">
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+            </svg>
+            Categories
+          </span>
+          <svg 
+            className={`w-5 h-5 transition-transform ${isCategoryMenuOpen ? 'rotate-180' : ''}`}
+            fill="none" 
+            stroke="currentColor" 
+            viewBox="0 0 24 24"
+          >
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+          </svg>
+        </button>
+      </div>
 
-      <CategoryMenu
-        initialCategory={initialCategories}
-        onSubcategorySelect={(_, slugPath) =>
-          handleCategoryNavigate(slugPath)
-        }
-      />
+      {/* -------- LEFT CATEGORY MENU -------- */}
+      <div className={`${isCategoryMenuOpen ? 'block' : 'hidden'} lg:block w-full lg:w-72 flex-shrink-0`}>
+        <CategoryMenu
+          initialCategory={initialCategories}
+          onSubcategorySelect={(_, slugPath) =>
+            handleCategoryNavigate(slugPath)
+          }
+          isMobileMenuOpen={isCategoryMenuOpen}
+          onMobileClose={() => setIsCategoryMenuOpen(false)}
+        />
+      </div>
 
       {/* -------- RIGHT PRODUCT PANEL -------- */}
+      <div className="flex-1 p-3 sm:p-4 lg:p-6">
+        {/* Current Category Info - Mobile */}
+        {categorySlugPath && (
+          <div className="lg:hidden mb-4 px-3 py-2 bg-gray-50 rounded-lg">
+            <p className="text-sm text-gray-600">Current Category:</p>
+            <p className="font-medium text-gray-800 capitalize">
+              {categorySlugPath.split('/').pop()?.replace(/-/g, ' ')}
+            </p>
+          </div>
+        )}
 
-      <div className="flex-1 p-4">
         <SearchFilter
           onSearch={handleSearch}
           initialBrand=""
@@ -148,145 +185,49 @@ export default function ProductListingPage({
           initialBrandData={initialBrands}
         />
 
-        <div className="relative min-h-[500px]">
+        {/* Results Summary */}
+        {!loading && (
+          <div className="mb-4 px-2 sm:px-0">
+            <p className="text-sm text-gray-600">
+              Found <span className="font-semibold text-emerald-600">{total}</span> products
+              {filters.searchQuery && (
+                <> for "<span className="font-medium">{filters.searchQuery}</span>"</>
+              )}
+              {filters.selectedBrand && (
+                <> from brand ID: <span className="font-medium">{filters.selectedBrand}</span></>
+              )}
+            </p>
+          </div>
+        )}
+
+        <div className="relative min-h-[300px] sm:min-h-[400px]">
           {loading && <ProductPanelLoader />}
 
-          <ProductGrid
-            products={products}
-            loading={false}
-            page={page}
-            total={total}
-            limit={limit}
-            onPageChange={(p) => {
-              setLoading(true)
-              setPage(p)
-            }}
-          />
+          {!loading && products.length === 0 ? (
+            <div className="text-center py-12">
+              <div className="text-5xl mb-4">🔍</div>
+              <h3 className="text-lg font-medium text-gray-700 mb-2">No products found</h3>
+              <p className="text-gray-500">Try adjusting your search criteria</p>
+            </div>
+          ) : (
+            <ProductGrid
+              products={products}
+              loading={false}
+              page={page}
+              total={total}
+              limit={limit}
+              onPageChange={(p) => {
+                setLoading(true)
+                setPage(p)
+                // Scroll to top on page change (mobile optimization)
+                if (window.innerWidth < 768) {
+                  window.scrollTo({ top: 0, behavior: 'smooth' })
+                }
+              }}
+            />
+          )}
         </div>
       </div>
     </div>
   )
 }
-
-
-// 'use client'
-
-// import { useEffect, useState } from 'react'
-// import { useRouter } from 'next/navigation'
-// import CategoryMenu from '@/components/categories/CategoryMenu'
-// import ProductGrid from '@/components/products/ProductGrid'
-// import SearchFilter from '@/components/ui/SearchFilter'
-// import { getProducts, getsearchProducts, transformProduct } from '@/lib/api'
-// import { findCategoryBySlugPath } from '@/lib/slug'
-
-// export default function ProductListingPage({
-//   categorySlugPath,
-//   initialCategories = [],
-//   initialBrands = [],
-// }: {
-//   categorySlugPath?: string
-//   initialCategories?: any[]
-//   initialBrands?: any[]
-// }) {
-//   const router = useRouter()
-
-//   const [categories] = useState<any[]>(initialCategories)
-//   const [brands] = useState<any[]>(initialBrands)
-//   const [products, setProducts] = useState<any[]>([])
-//   const [loading, setLoading] = useState(false)
-//   const [filters, setFilters] = useState<{
-//     searchQuery: string
-//     selectedBrand: string
-//   }>({
-//     searchQuery: '',
-//     selectedBrand: '',
-//   })
-
-//   /* Fetch products only */
-//   useEffect(() => {
-//   const fetchProducts = async () => {
-//     try {
-//       setLoading(true)
-
-//       const hasSearch =
-//         !!filters.searchQuery || !!filters.selectedBrand
-
-//       // CATEGORY (shared)
-//       let categoryId: number | undefined
-//       if (categorySlugPath) {
-//         const slugs = categorySlugPath.split('/')
-//         const category = findCategoryBySlugPath(categories, slugs)
-//         categoryId = category?.id
-//       }
-
-//       let response
-
-//       if (hasSearch) {
-//         response = await getsearchProducts({
-//           searchTerm: filters.searchQuery,
-//           searchBrandTerm: filters.selectedBrand,
-//         })
-//       } else {
-//         response = await getProducts({
-//           category_id: categoryId,
-//         })
-//       }
-
-//       const mapped =
-//         response?.variants?.rows?.map(transformProduct) || []
-
-//       setProducts(mapped)
-//     } finally {
-//       setLoading(false)
-//     }
-//   }
-
-//   fetchProducts()
-// }, [categorySlugPath, filters])
-
-
-
-//   const handleSubcategorySelect = (_id: number, slugPath: string[]) => {
-//     router.push(`/${slugPath.join('/')}`)
-//   }
-
-//   const handleSearch = ({
-//     searchQuery,
-//     selectedBrand,
-//     clear,
-//   }: {
-//     searchQuery: string
-//     selectedBrand: string
-//     clear: boolean
-//   }) => {
-//     setFilters({
-//       searchQuery: clear ? '' : searchQuery,
-//       selectedBrand: clear ? '' : selectedBrand,
-//     })
-//   }
-
-
-//   return (
-//     <div className="flex min-h-[calc(100vh-140px)]">
-//       <CategoryMenu
-//         initialCategory={categories}
-//         onSubcategorySelect={handleSubcategorySelect}
-//       />
-
-
-//       <div className="flex-1 p-4">
-//         {brands.length > 0 && (
-//           <SearchFilter
-//             onSearch={handleSearch}
-//             initialBrand=""
-//             initialSearch=""
-//             initialBrandData={brands}
-//           />
-
-//         )}
-
-//         <ProductGrid products={products} loading={loading} />
-//       </div>
-//     </div>
-//   )
-// }

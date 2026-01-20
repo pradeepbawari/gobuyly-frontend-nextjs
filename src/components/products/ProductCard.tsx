@@ -24,20 +24,19 @@ export default function ProductCard({ product = {} }: ProductCardProps) {
   const [quantity, setQuantity] = useState(1)
   const [showZoom, setShowZoom] = useState(false)
   const [selectedImageIndex, setSelectedImageIndex] = useState(0)
-  const [zoomPosition, setZoomPosition] = useState({ x: 0, y: 0 })
-  const [showZoomCursor, setShowZoomCursor] = useState(false)
   const { addToCart } = useCart()
 
   // Handle undefined product
   if (!product || Object.keys(product).length === 0) {
     return (
-      <div className="grid grid-cols-12 gap-6 bg-white p-5 rounded-xl border border-gray-200 items-center mb-3">
-        <div className="col-span-12 text-center py-8 text-gray-500">
+      <div className="flex flex-col sm:flex-row sm:items-center bg-white p-4 rounded-lg border border-gray-200 mb-3 gap-4">
+        <div className="w-full text-center py-8 text-gray-500">
           Product data not available
         </div>
       </div>
     )
   }
+
   const price = parseFloat(product.price) || 0
   const salePrice = parseFloat(product.sale_price) || 0
   const finalPrice = salePrice > 0 ? salePrice : price
@@ -51,21 +50,10 @@ export default function ProductCard({ product = {} }: ProductCardProps) {
 
   const mainImage = allImages[selectedImageIndex] || null
 
-  /* ---------------- Image Zoom Handlers ---------------- */
-  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (!showZoomCursor) return
-
-    const { left, top, width, height } = e.currentTarget.getBoundingClientRect()
-    const x = ((e.clientX - left) / width) * 100
-    const y = ((e.clientY - top) / height) * 100
-
-    setZoomPosition({ x, y })
-  }
-
   const handleImageClick = () => {
     if (allImages.length > 0) {
       setShowZoom(true)
-      document.body.style.overflow = 'hidden' // Prevent scrolling
+      document.body.style.overflow = 'hidden'
     }
   }
 
@@ -76,17 +64,14 @@ export default function ProductCard({ product = {} }: ProductCardProps) {
 
   const nextImage = () => {
     setSelectedImageIndex((prev) => (prev + 1) % allImages.length)
-    setZoomPosition({ x: 50, y: 50 })
   }
 
   const prevImage = () => {
     setSelectedImageIndex((prev) =>
       prev === 0 ? allImages.length - 1 : prev - 1
     )
-    setZoomPosition({ x: 50, y: 50 })
   }
 
-  /* ---------------- Quantity handlers ---------------- */
   const handleIncrease = () => {
     setQuantity((prev) => Math.min(prev + 1, product.stock))
   }
@@ -103,199 +88,159 @@ export default function ProductCard({ product = {} }: ProductCardProps) {
 
   return (
     <>
-      <div
-        className="grid grid-cols-[101px_repeat(10,minmax(0,1fr))_40px] items-center gap-5 bg-white px-3 py-2 mb-3
-                 rounded-lg border-b-1 border-gray-200 transition-all duration-200
-                 hover:shadow-md hover:border-emerald-500 hover:-translate-y-0.5"
-      >
-        {/* Product Image with Zoom Preview */}
-        <div className="col-span-1 relative w-[100px]">
-          {mainImage ? (
-            <div
-              className="relative w-18 h-18 mx-auto cursor-zoom-in group"
-              onClick={handleImageClick}
-              onMouseEnter={() => setShowZoomCursor(true)}
-              onMouseLeave={() => setShowZoomCursor(false)}
-              onMouseMove={handleMouseMove}
-            >
-              <Image
-                src={mainImage}
-                alt={product.sku || 'Product'}
-                fill
-                className="object-cover rounded-lg"
-                unoptimized
-              />
-              
-              {/* Zoom icon overlay */}
-              <div className="absolute inset-0 bg-black/0 group-hover:bg-black/5 transition-colors rounded-lg flex items-center justify-center">
-                <FontAwesomeIcon
-                  icon={faSearchPlus}
-                  className="text-gray-600 opacity-0 group-hover:opacity-100 transition-opacity text-lg"
+      {/* Single HTML structure for both mobile and desktop */}
+      <div className="flex flex-col sm:grid sm:grid-cols-14 bg-white rounded-lg border border-gray-200 mb-3 
+                      transition-all duration-200 hover:shadow-md hover:border-emerald-500 hover:-translate-y-0.5
+                      p-3 sm:p-4 gap-3 sm:gap-4">
+        
+        {/* Product Image - Mobile: Full width, Desktop: Fixed column */}
+        <div 
+          className="w-full sm:col-span-2 flex justify-center sm:block cursor-pointer"
+          onClick={handleImageClick}
+        >
+          <div className="relative w-24 h-24 sm:w-16 sm:h-16 md:w-20 md:h-20 lg:w-24 lg:h-24">
+            {mainImage ? (
+              <>
+                <Image
+                  src={mainImage}
+                  alt={product.sku || 'Product'}
+                  fill
+                  className="object-cover rounded-lg"
+                  unoptimized
                 />
-              </div>
-
-              {/* Image counter badge */}
-              {/* {allImages.length > 1 && (
-                <div className="absolute -top-2 -left-10 bg-emerald-500 text-white text-xs px-2 py-1 rounded-full">
-                  {allImages.length}
-                </div>
-              )} */}
-            </div>
-          ) : (
-            <div 
-              className="w-24 h-24 bg-gray-100 rounded-lg flex items-center justify-center cursor-pointer"
-              onClick={handleImageClick}
-            >
-              <span className="text-gray-400 text-xs">No Image</span>
-            </div>
-          )}
-
-          {/* Thumbnail Strip (if multiple images) */}
-          {/* {allImages.length > 1 && (
-            <div className="flex justify-start gap-1 mt-2">
-              {allImages.slice(0, 3).map((img, index) => (
-                <button
-                  key={index}
-                  onClick={(e) => {
-                    e.stopPropagation()
-                    setSelectedImageIndex(index)
-                  }}
-                  className={`w-8 h-8 rounded border ${
-                    selectedImageIndex === index
-                      ? 'border-emerald-500'
-                      : 'border-gray-300'
-                  } overflow-hidden`}
-                >
-                  <Image
-                    src={img}
-                    alt={`Thumb ${index + 1}`}
-                    width={20}
-                    height={20}
-                    className="object-cover"
-                    unoptimized
+                <div className="absolute bottom-1 right-1 sm:bottom-0.5 sm:right-0.5 
+                                bg-black/70 text-white p-1 sm:p-0.5 rounded-full">
+                  <FontAwesomeIcon 
+                    icon={faSearchPlus} 
+                    className="text-xs sm:text-[10px] md:text-xs" 
                   />
-                </button>
-              ))}
-              {allImages.length > 3 && (
-                <div className="w-5 h-5 flex items-center justify-center text-xs text-gray-500">
-                  +{allImages.length - 3}
                 </div>
-              )}
-            </div>
-          )} */}
-        </div>
-
-        {/* Rest of your existing product card code remains the same */}
-        {/* Product Details */}
-        <div className="col-span-6">
-		<div className="flex justify-between gap-3">
-        <h4 className="font-semibold text-gray-800 text-md">
-          {/* <span>
-            {product?.title?.company_id} {product?.product_name} {product?.title?.size} {product?.title?.materials} {product?.title?.color_id !== 'No Colour' ? product?.title?.color_id : ''}
-          </span> */}
-          <span>
-            {product?.displayTitle}
-          </span>
-		  </h4>
- {product?.title?.company_id && <span className="text-xs font-medium text-gray-600 px-2 py-1.5 h-7 rounded uppercase bg-gray-100">{product?.title?.company_id}</span>}
-</div>
-          {/* <p className="text-gray-500 text-[13px] mb-2 line-clamp-2">
-            {product.description || 'Premium product'}
-          </p> */}
-
-          <div className="flex items-center gap-3">
-            <div className="flex items-center">
-              <FontAwesomeIcon icon={faStar} className="text-amber-400 mr-1" />
-              <span className="text-sm font-medium">{product.rating || 4.5}</span>
-              <span className="text-gray-400 text-sm ml-1">/ 5</span>
-            </div>
-
-            <span className="text-gray-400">•</span>
-
-            <div className="text-gray-500 text-sm">
-              <FontAwesomeIcon icon={faShippingFast} className="mr-1" />
-              Delivery in 2 Days
-            </div>
+              </>
+            ) : (
+              <div className="w-full h-full bg-gray-100 rounded-lg flex items-center justify-center">
+                <span className="text-gray-400 text-xs">No Image</span>
+              </div>
+            )}
           </div>
         </div>
 
-        {/* Stock */}
-        {/* <div className="col-span-2">
-          <span className="stock-badge col-span-2 px-3 py-0.5">
-            Stock
-          </span>
-          <p className="text-gray-500 text-xs mt-1">
-            {product.stock || 0} available
-          </p>
-        </div> */}
+        {/* Product Details - Mobile: Below image, Desktop: Middle columns */}
+        <div className="sm:col-span-5 lg:col-span-6">
+          {/* Brand & Title */}
+          <div className="flex flex-col sm:flex-row sm:items-start gap-1 sm:gap-2 mb-2">
+            <h4 className="font-semibold text-gray-800 text-sm sm:text-base line-clamp-2 flex-1">
+              {product?.displayTitle || 'Product Title'}
+            </h4>
+            {product?.title?.company_id && (
+              <span className="text-xs font-medium text-gray-600 px-2 py-1 
+                             bg-gray-100 rounded uppercase self-start sm:self-auto">
+                {product.title.company_id}
+              </span>
+            )}
+          </div>
 
-        {/* Price */}
-        <div className="col-span-1">
-          <div className="font-bold text-gray-700 text-md">
+          {/* Rating & Delivery */}
+          <div className="flex items-center gap-2 sm:gap-3 mb-2 sm:mb-3">
+            <div className="flex items-center text-xs sm:text-sm">
+              <FontAwesomeIcon icon={faStar} className="text-amber-400 mr-1 text-xs sm:text-sm" />
+              <span className="font-medium">{product.rating || 4.5}</span>
+              <span className="text-gray-400 ml-0.5">/5</span>
+            </div>
+            <span className="text-gray-300 text-xs sm:text-sm">•</span>
+            <div className="text-gray-500 text-xs sm:text-sm flex items-center">
+              <FontAwesomeIcon icon={faShippingFast} className="mr-1 text-xs sm:text-sm" />
+              <span>2 Days</span>
+            </div>
+          </div>
+
+          {/* Price - Mobile: Inline, Desktop: In its own column */}
+          <div className="sm:hidden mb-3">
+            <div className="font-bold text-gray-700 text-lg">
+              ₹{finalPrice.toLocaleString()}
+            </div>
+            {hasDiscount && (
+              <div className="text-xs text-gray-500 line-through">
+                ₹{price.toLocaleString()}
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Price - Desktop Only */}
+        <div className="hidden sm:block sm:col-span-2">
+          <div className="font-bold text-gray-700 text-base lg:text-lg">
             ₹{finalPrice.toLocaleString()}
           </div>
           {hasDiscount && (
-            <div className="text-xs text-gray-700 line-through">
+            <div className="text-xs text-gray-500 line-through">
               ₹{price.toLocaleString()}
             </div>
           )}
         </div>
 
-        {/* Quantity Controls */}
-        <div className="col-span-2">
-          <div className="flex items-center gap-2 justify-center">
-            <button
-              onClick={handleDecrease}
-              disabled={quantity === 1}
-              className="w-8 h-8 p-4 rounded-lg border border-gray-300 bg-white
+        {/* Quantity Controls - Mobile: Below details, Desktop: Next column */}
+        <div className="sm:col-span-2">
+          <div className="flex items-center justify-between sm:justify-center gap-2">
+            <span className="text-sm text-gray-600 sm:hidden">Quantity:</span>
+            <div className="flex items-center gap-1 sm:gap-2">
+              <button
+                onClick={handleDecrease}
+                disabled={quantity === 1}
+                className="w-8 h-8 sm:w-7 sm:h-7 md:w-8 md:h-8 rounded border border-gray-300 bg-white
                          flex items-center justify-center font-semibold
                          disabled:opacity-50 disabled:cursor-not-allowed
-                         hover:bg-gray-50"
-            >
-              <FontAwesomeIcon icon={faMinus} className='text-xs text-gray-600' />
-            </button>
+                         hover:bg-gray-50 active:bg-gray-100"
+              >
+                <FontAwesomeIcon icon={faMinus} className="text-xs text-gray-600" />
+              </button>
 
-            <span className="min-w-8 text-center font-semibold text-sm">
-              {quantity}
-            </span>
+              <span className="min-w-6 sm:min-w-8 text-center font-semibold text-sm">
+                {quantity}
+              </span>
 
-            <button
-              onClick={handleIncrease}
-              disabled={quantity >= product.stock}
-              className="w-8 h-8 p-4 rounded-lg border border-gray-300 bg-white
+              <button
+                onClick={handleIncrease}
+                disabled={quantity >= product.stock}
+                className="w-8 h-8 sm:w-7 sm:h-7 md:w-8 md:h-8 rounded border border-gray-300 bg-white
                          flex items-center justify-center font-semibold
                          disabled:opacity-50 disabled:cursor-not-allowed
-                         hover:bg-gray-50"
-            >
-              <FontAwesomeIcon icon={faPlus} className='text-xs text-gray-600' />
-            </button>
+                         hover:bg-gray-50 active:bg-gray-100"
+              >
+                <FontAwesomeIcon icon={faPlus} className="text-xs text-gray-600" />
+              </button>
+            </div>
           </div>
         </div>
 
-        {/* Add to Cart */}
-        <div className="col-span-2">
+        {/* Add to Cart Button - Mobile: Full width, Desktop: Last column */}
+        <div className="sm:col-span-2">
           <button
             onClick={handleAddToCart}
             disabled={product.stock <= 0}
-            className="bg-emerald-500 w-full text-white px-4 py-1 rounded-lg
-                       font-medium flex items-center justify-center gap-2
-                       hover:bg-emerald-600 transition-colors
-                       disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full bg-emerald-500 text-white rounded-lg font-medium
+                     flex items-center justify-center gap-2
+                     hover:bg-emerald-600 transition-colors active:scale-95
+                     disabled:opacity-50 disabled:cursor-not-allowed
+                     py-2.5 sm:py-2 md:py-2.5"
           >
-            <FontAwesomeIcon icon={faCartPlus} className="text-xs" />
-            <span className="hidden sm:inline">Add</span>
+            <FontAwesomeIcon icon={faCartPlus} className="text-sm" />
+            <span className="sm:hidden">Add to Cart</span>
+            <span className="hidden sm:inline md:hidden">Add</span>
+            <span className="hidden md:inline lg:hidden">Add to Cart</span>
+            <span className="hidden lg:inline">Add to Cart</span>
           </button>
         </div>
       </div>
 
-      {/* Image Zoom Modal/Overlay */}
+      {/* Image Zoom Modal - Responsive */}
       {showZoom && (
-        <div className="fixed top-16 inset-0 bg-black/30 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div className="fixed inset-0 bg-black/90 z-50 flex items-center justify-center p-2 sm:p-4">
           {/* Close button */}
           <button
             onClick={closeZoom}
-            className="absolute top-4 right-4 text-white text-2xl z-10
-                     hover:text-emerald-400 transition-colors"
+            className="absolute top-3 sm:top-4 right-3 sm:right-4 text-white text-xl sm:text-2xl z-10
+                     hover:text-emerald-400 transition-colors p-2"
+            aria-label="Close zoom"
           >
             <FontAwesomeIcon icon={faTimes} />
           </button>
@@ -305,15 +250,19 @@ export default function ProductCard({ product = {} }: ProductCardProps) {
             <>
               <button
                 onClick={prevImage}
-                className="absolute left-4 top-1/2 -translate-y-1/2
-                         text-white text-2xl p-3 hover:text-emerald-400 transition-colors"
+                className="absolute left-2 sm:left-4 top-1/2 -translate-y-1/2
+                         text-white text-xl sm:text-2xl p-2 sm:p-3 
+                         hover:text-emerald-400 transition-colors"
+                aria-label="Previous image"
               >
                 <FontAwesomeIcon icon={faChevronLeft} />
               </button>
               <button
                 onClick={nextImage}
-                className="absolute right-4 top-1/2 -translate-y-1/2
-                         text-white text-2xl p-3 hover:text-emerald-400 transition-colors"
+                className="absolute right-2 sm:right-4 top-1/2 -translate-y-1/2
+                         text-white text-xl sm:text-2xl p-2 sm:p-3
+                         hover:text-emerald-400 transition-colors"
+                aria-label="Next image"
               >
                 <FontAwesomeIcon icon={faChevronRight} />
               </button>
@@ -321,34 +270,35 @@ export default function ProductCard({ product = {} }: ProductCardProps) {
           )}
 
           {/* Main zoomed image */}
-          <div className="relative w-full max-w-4xl h-[80vh]">
+          <div className="relative w-full h-[60vh] sm:h-[70vh] md:h-[80vh] max-w-4xl">
             <Image
               src={mainImage!}
               alt={product.sku || 'Product'}
               fill
               className="object-contain"
               unoptimized
+              sizes="(max-width: 640px) 100vw, (max-width: 768px) 90vw, 80vw"
             />
           </div>
 
-          {/* Thumbnail strip at bottom */}
+          {/* Thumbnail strip */}
           {allImages.length > 1 && (
-            <div className="absolute bottom-4 left-0 right-0">
-              <div className="flex justify-center gap-2 overflow-x-auto px-4 py-2">
+            <div className="absolute bottom-2 sm:bottom-4 left-0 right-0 px-2">
+              <div className="flex justify-center gap-1 sm:gap-2 overflow-x-auto py-2">
                 {allImages.map((img, index) => (
                   <button
                     key={index}
                     onClick={() => setSelectedImageIndex(index)}
-                    className={`flex-shrink-0 w-16 h-16 rounded-lg border-2 overflow-hidden
-                              transition-all ${
-                                selectedImageIndex === index
-                                  ? 'border-emerald-500 scale-105'
-                                  : 'border-transparent opacity-70 hover:opacity-100'
+                    className={`flex-shrink-0 w-10 h-10 sm:w-12 sm:h-12 md:w-16 md:h-16 rounded-lg border-2 overflow-hidden
+                              transition-all ${selectedImageIndex === index
+                                ? 'border-emerald-500 scale-105'
+                                : 'border-transparent opacity-70 hover:opacity-100'
                               }`}
+                    aria-label={`View image ${index + 1}`}
                   >
                     <Image
                       src={img}
-                      alt={`Thumb ${index + 1}`}
+                      alt={`Thumbnail ${index + 1}`}
                       width={64}
                       height={64}
                       className="object-cover w-full h-full"
@@ -361,7 +311,8 @@ export default function ProductCard({ product = {} }: ProductCardProps) {
           )}
 
           {/* Image counter */}
-          <div className="absolute top-4 left-4 text-white bg-black/50 px-3 py-1 rounded-full text-sm">
+          <div className="absolute top-2 sm:top-3 left-2 sm:left-3 text-white bg-black/50 
+                        px-2 sm:px-3 py-1 rounded-full text-xs sm:text-sm">
             {selectedImageIndex + 1} / {allImages.length}
           </div>
         </div>
