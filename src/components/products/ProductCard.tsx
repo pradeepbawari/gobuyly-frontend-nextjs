@@ -242,7 +242,7 @@ export default function ProductCard({ product = {} }: ProductCardProps) {
                      hover:text-emerald-400 transition-colors p-2"
             aria-label="Close zoom"
           >
-            <FontAwesomeIcon icon={faTimes} />
+		  {/*<FontAwesomeIcon icon={faTimes} />*/}
           </button>
 
           {/* Navigation arrows */}
