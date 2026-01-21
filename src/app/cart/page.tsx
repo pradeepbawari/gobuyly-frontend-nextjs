@@ -151,7 +151,7 @@ export default function CartPage() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Cart Items */}
         <div className="lg:col-span-2">
-          <div className="bg-white rounded-2xl shadow-sm p-6">
+          <div className="bg-white rounded-2xl shadow-sm p-0 md:p-6">
             <div className="flex justify-between items-center mb-6">
               <h2 className="text-xl font-semibold text-gray-800">
                 Items in Cart ({cart.reduce((s, i) => s + i.quantity, 0)})
@@ -169,9 +169,9 @@ export default function CartPage() {
               {cart.map(item => (
                 <div
                   key={item.product.id}
-                  className="flex items-center gap-4 p-4 border border-gray-200 rounded-xl"
+                  className="flex flex-col md:flex-row items-center gap-4 p-4 border border-gray-200 rounded-xl"
                 >
-                  <div className="w-24 h-28 relative">
+                  <div className="w-full xs:w-20 sm:w-24 h-48 xs:h-24 sm:h-28 relative flex-shrink-0">
                     {item.product.image ? (
                       <Image
                         src={item.product.image}
@@ -239,63 +239,7 @@ export default function CartPage() {
         </div>
 
         {/* Summary */}
-        <div className="bg-white rounded-2xl shadow-sm p-6 sticky top-24">
           <OrderSummary />
-          {/* <h2 className="text-xl font-semibold mb-6">Order Summary</h2>
-
-          <p>
-            Shipping Address: <span>{user?.address}</span>
-          </p>
-          <p>
-            Pincode: <span>{user?.pincode}</span>
-          </p>
-
-          {addressChange && (
-            <div className="bg-gray-200 p-3 mt-2">
-              <input
-                name="address"
-                onChange={handleChange}
-                className="px-4 py-2 border rounded-lg w-full"
-              />
-              <HeaderPincodeChecker onChange={handlePincodeChange} />
-              <button
-                onClick={updateHandler}
-                disabled={pincode === '000000'}
-                className="bg-green-600 text-white px-4 py-1 rounded mt-2"
-              >
-                Update
-              </button>
-            </div>
-          )}
-
-          <button onClick={addressHandler} className="text-blue-500 mt-2">
-            {addressChange ? 'Cancel' : 'Change'}
-          </button>
-
-          {error && <p className="text-red-500 mt-2">{error}</p>}
-
-          <div className="mt-6">
-            <div className="flex justify-between">
-              <span>Subtotal</span>
-              <span>₹{total}</span>
-            </div>
-            <div className="flex justify-between">
-              <span>Tax (18%)</span>
-              <span>₹{(total * 0.18).toFixed(2)}</span>
-            </div>
-            <div className="flex justify-between font-bold">
-              <span>Total</span>
-              <span>₹{(total * 1.18).toFixed(2)}</span>
-            </div>
-          </div>
-
-          <button
-            onClick={handleProceed}
-            className="w-full bg-emerald-500 text-white py-3 rounded-lg mt-6"
-          >
-            Proceed to Checkout
-          </button> */}
-        </div>
       </div>
     </div>
   )

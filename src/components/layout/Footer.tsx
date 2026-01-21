@@ -10,10 +10,10 @@ export default function Footer() {
               GoBuyly
             </div>
             <div className="flex gap-4">
-              <a href="#" className="text-gray-400 hover:text-white">FB</a>
-              <a href="#" className="text-gray-400 hover:text-white">TW</a>
-              <a href="#" className="text-gray-400 hover:text-white">IG</a>
-              <a href="#" className="text-gray-400 hover:text-white">IN</a>
+              <a href="#" className="text-gray-400 hover:text-white">Facebook</a>
+              <a href="#" className="text-gray-400 hover:text-white">X</a>
+              <a href="#" className="text-gray-400 hover:text-white">Youtube</a>
+              <a href="#" className="text-gray-400 hover:text-white">Linkedin</a>
             </div>
           </div>
           

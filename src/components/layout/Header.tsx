@@ -75,7 +75,7 @@ export default function Header() {
               ) : (
                 <div className="flex gap-4 items-center">
                   <span className='capitalize text-gray-600 hidden lg:inline-block'>{user?.name}</span>
-                  <Link href="/profile" className="text-gray-700 hover:text-emerald-600 transition-colors">
+                  <Link href="/account/profile" className="text-gray-700 hover:text-emerald-600 transition-colors">
                     <FontAwesomeIcon icon={faUserAlt} className="text-lg" />
                   </Link>
                   <button 
@@ -154,7 +154,7 @@ export default function Header() {
                   {/* Profile & Logout */}
                   <div className="flex gap-2">
                     <Link 
-                      href="/profile" 
+                      href="/account/profile" 
                       className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
                       onClick={closeMenu}
                     >
