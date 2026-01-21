@@ -110,10 +110,10 @@ export default function ProductCard({ product = {} }: ProductCardProps) {
                 />
                 <div className="absolute bottom-1 right-1 sm:bottom-0.5 sm:right-0.5 
                                 bg-black/70 text-white p-1 sm:p-0.5 rounded-full">
-                  <FontAwesomeIcon 
+								{/*<FontAwesomeIcon 
                     icon={faSearchPlus} 
                     className="text-xs sm:text-[10px] md:text-xs" 
-                  />
+								/>*/}
                 </div>
               </>
             ) : (
@@ -242,7 +242,7 @@ export default function ProductCard({ product = {} }: ProductCardProps) {
                      hover:text-emerald-400 transition-colors p-2"
             aria-label="Close zoom"
           >
-		  {/*<FontAwesomeIcon icon={faTimes} />*/}
+            {<FontAwesomeIcon icon={faTimes} />
           </button>
 
           {/* Navigation arrows */}
