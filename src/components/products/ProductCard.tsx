@@ -108,13 +108,13 @@ export default function ProductCard({ product = {} }: ProductCardProps) {
                   className="object-cover rounded-lg"
                   unoptimized
                 />
-                <div className="absolute bottom-1 right-1 sm:bottom-0.5 sm:right-0.5 
+                {/*<div className="absolute bottom-1 right-1 sm:bottom-0.5 sm:right-0.5 
                                 bg-black/70 text-white p-1 sm:p-0.5 rounded-full">
-								{/*<FontAwesomeIcon 
+                  <FontAwesomeIcon 
                     icon={faSearchPlus} 
                     className="text-xs sm:text-[10px] md:text-xs" 
-								/>*/}
-                </div>
+                  />
+                </div>*/}
               </>
             ) : (
               <div className="w-full h-full bg-gray-100 rounded-lg flex items-center justify-center">
