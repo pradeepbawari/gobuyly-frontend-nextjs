@@ -40,6 +40,7 @@ export default function ProductListingPage({
   const [page, setPage] = useState<number>(1)
   const [total, setTotal] = useState<number>(0)
   const [isCategoryMenuOpen, setIsCategoryMenuOpen] = useState(false)
+  const [searchEmpty, setSearchEmpty] = useState<boolean>(false)
 
   const limit = 15
 
@@ -90,8 +91,9 @@ export default function ProductListingPage({
             page,
             limit,
           })
+          setSearchEmpty(false)
         }
-
+        setSearchEmpty(response.searchEmpty)
         setProducts(
           response?.variants?.rows?.map(transformProduct) || []
         )
@@ -188,9 +190,10 @@ export default function ProductListingPage({
         {/* Results Summary */}
         {!loading && (
           <div className="mb-4 px-2 sm:px-0">
+            {searchEmpty && (<div className='p-2 pl-0 w-full text-gray-900'>No product match - {filters.searchQuery}</div>)}
             <p className="text-sm text-gray-600">
               Found <span className="font-semibold text-emerald-600">{total}</span> products
-              {filters.searchQuery && (
+              {filters.searchQuery && !searchEmpty && (
                 <> for "<span className="font-medium">{filters.searchQuery}</span>"</>
               )}
               {filters.selectedBrand && (

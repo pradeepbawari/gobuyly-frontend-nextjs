@@ -33,45 +33,41 @@ export default function SearchFilter({
     setBrands(initialBrandData)
   }, [])
 
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault()
-    setIsMobileFiltersOpen(false)
-    onSearch({
-      searchQuery,
-      selectedBrand,
-      clear
-    })
-  }
+  const handleSearch = (e?: React.FormEvent) => {
+  e?.preventDefault()
+  setIsMobileFiltersOpen(false)
+  onSearch({
+    searchQuery,
+    selectedBrand,
+    clear: false, // searching, not clearing
+  })
+}
 
-  const handleBrandChange = (brandId: string) => {
-    setSelectedBrand(brandId)
-    onSearch({
-      searchQuery,
-      selectedBrand: brandId,
-      clear
-    })
-  }
+const handleBrandChange = (brandId: string) => {
+  setSelectedBrand(brandId)
+  onSearch({
+    searchQuery,
+    selectedBrand: brandId,
+    clear: false,
+  })
+}
 
-  const handleClearFilters = () => {
-    setSearchQuery('')
-    setSelectedBrand('')
-    setClear(true)
-    setIsMobileFiltersOpen(false)
-    onSearch({
-      searchQuery: '',
-      selectedBrand: '',
-      clear
-    })
-  }
+const handleClearFilters = () => {
+  setSearchQuery('')
+  setSelectedBrand('')
+  setIsMobileFiltersOpen(false)
+  onSearch({
+    searchQuery: '',
+    selectedBrand: '',
+    clear: true, // indicate clear action to parent
+  })
+}
 
-  const handleMobileSearch = () => {
-    setIsMobileFiltersOpen(false)
-    onSearch({
-      searchQuery,
-      selectedBrand,
-      clear
-    })
-  }
+// Mobile search uses same logic as handleSearch
+const handleMobileSearch = () => {
+  handleSearch()
+}
+
 
   return (
     <div className="bg-white pt-3 pb-3">
