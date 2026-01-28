@@ -70,7 +70,7 @@ const handleMobileSearch = () => {
 
 
   return (
-    <div className="bg-white pt-3 pb-3">
+    <div className="bg-white pb-3">
       {/* Mobile Filter Toggle Button */}
       <div className="md:hidden mb-3">
         <button
@@ -125,7 +125,7 @@ const handleMobileSearch = () => {
               />
               <button 
                 type="submit" 
-                className="absolute right-0 top-0 bg-emerald-500 text-white py-3 px-6 rounded-r-lg hover:bg-emerald-600 transition-colors"
+                className="absolute right-0 top-0 bg-[#1E1E1E] text-white py-2.5 px-6 rounded-r-lg hover:bg-emerald-600 transition-colors"
               >
                 <span className="hidden md:inline mr-2">Search</span>
                 <FontAwesomeIcon icon={faArrowRight} className="text-sm" />

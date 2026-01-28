@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import Image from 'next/image'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import {
@@ -86,19 +86,36 @@ export default function ProductCard({ product = {} }: ProductCardProps) {
     setQuantity(1)
   }
 
+  useEffect(() => {
+  if (!showZoom) return
+
+  const handleKeyDown = (event: KeyboardEvent) => {
+    if (event.key === 'Escape') {
+      closeZoom()
+    }
+  }
+
+  window.addEventListener('keydown', handleKeyDown)
+
+  return () => {
+    window.removeEventListener('keydown', handleKeyDown)
+  }
+}, [showZoom])
+
+
   return (
     <>
       {/* Single HTML structure for both mobile and desktop */}
-      <div className="flex flex-col sm:grid sm:grid-cols-14 bg-white rounded-lg border border-gray-200 mb-3 
-                      transition-all duration-200 hover:shadow-md hover:border-emerald-500 hover:-translate-y-0.5
-                      p-3 sm:p-4 gap-3 sm:gap-4">
+      <div className="flex flex-col items-center sm:grid sm:grid-cols-[72px_repeat(12,1fr)] bg-white rounded-lg border-b border-gray-200 mb-0 
+                      transition-all duration-200 hover:-translate-y-0.5 hover:bg-green-50
+                      p-3 sm:p-2 sm:pr-0 gap-3 sm:gap-4">
         
         {/* Product Image - Mobile: Full width, Desktop: Fixed column */}
         <div 
-          className="w-full sm:col-span-2 flex justify-center sm:block cursor-pointer"
+          className="w-full flex justify-center sm:block cursor-pointer"
           onClick={handleImageClick}
         >
-          <div className="relative w-24 h-24 sm:w-16 sm:h-16 md:w-20 md:h-20 lg:w-24 lg:h-24">
+          <div className="relative w-24 h-24 sm:w-16 sm:h-16 md:w-20 md:h-20 lg:w-16 lg:h-16">
             {mainImage ? (
               <>
                 <Image
@@ -122,26 +139,26 @@ export default function ProductCard({ product = {} }: ProductCardProps) {
         <div className="sm:col-span-5 lg:col-span-6">
           {/* Brand & Title */}
           <div className="flex flex-col sm:flex-row sm:items-start gap-1 sm:gap-2 mb-2">
-            <h4 className="font-semibold text-gray-800 text-sm sm:text-base line-clamp-2 flex-1">
+            <h4 className="font-normal text-[#2D2926] text-sm sm:text-base line-clamp-2 flex-1">
               {product?.displayTitle || 'Product Title'}
             </h4>
-            {product?.title?.company_id && (
+            {/* {product?.title?.company_id && (
               <span className="text-xs font-medium text-gray-600 px-2 py-1 
                              bg-gray-100 rounded uppercase self-start sm:self-auto">
                 {product.title.company_id}
               </span>
-            )}
+            )} */}
           </div>
 
           {/* Rating & Delivery */}
-          <div className="flex items-center gap-2 sm:gap-3 mb-2 sm:mb-3">
-            <div className="flex items-center text-xs sm:text-sm">
+          <div className="flex items-center gap-2 sm:gap-3 mb-2 sm:mb-0">
+            {/* <div className="flex items-center text-xs sm:text-sm">
               <FontAwesomeIcon icon={faStar} className="text-amber-400 mr-1 text-xs sm:text-sm" />
               <span className="font-medium">{product.rating || 4.5}</span>
               <span className="text-gray-400 ml-0.5">/5</span>
             </div>
-            <span className="text-gray-300 text-xs sm:text-sm">•</span>
-            <div className="text-gray-500 text-xs sm:text-sm flex items-center">
+            <span className="text-gray-300 text-xs sm:text-sm">•</span> */}
+            <div className="text-gray-400 text-xs sm:text-sm flex items-center">
               <FontAwesomeIcon icon={faShippingFast} className="mr-1 text-xs sm:text-sm" />
               <span>2 Days</span>
             </div>
@@ -149,7 +166,7 @@ export default function ProductCard({ product = {} }: ProductCardProps) {
 
           {/* Price - Mobile: Inline, Desktop: In its own column */}
           <div className="sm:hidden mb-3">
-            <div className="font-bold text-gray-700 text-lg">
+            <div className="font-bold text-green-800 text-lg">
               ₹{finalPrice.toLocaleString()}
             </div>
             {hasDiscount && (
@@ -161,13 +178,13 @@ export default function ProductCard({ product = {} }: ProductCardProps) {
         </div>
 
         {/* Price - Desktop Only */}
-        <div className="hidden sm:block sm:col-span-2">
-          <div className="font-bold text-gray-700 text-base lg:text-lg">
-            ₹{finalPrice.toLocaleString()}
+        <div className="hidden sm:block sm:col-span-2 text-center">
+          <div className="font-normal text-green-700 text-base lg:text-lg">
+            ₹ {finalPrice.toLocaleString()}
           </div>
           {hasDiscount && (
             <div className="text-xs text-gray-500 line-through">
-              ₹{price.toLocaleString()}
+              ₹ {price.toLocaleString()}
             </div>
           )}
         </div>
@@ -181,14 +198,14 @@ export default function ProductCard({ product = {} }: ProductCardProps) {
                 onClick={handleDecrease}
                 disabled={quantity === 1}
                 className="w-8 h-8 sm:w-7 sm:h-7 md:w-8 md:h-8 rounded border border-gray-300 bg-white
-                         flex items-center justify-center font-semibold
+                         flex items-center justify-center font-normal cursor-pointer
                          disabled:opacity-50 disabled:cursor-not-allowed
                          hover:bg-gray-50 active:bg-gray-100"
               >
                 <FontAwesomeIcon icon={faMinus} className="text-xs text-gray-600" />
               </button>
 
-              <span className="min-w-6 sm:min-w-8 text-center font-semibold text-sm">
+              <span className="min-w-6 sm:min-w-8 text-center font-normal text-sm">
                 {quantity}
               </span>
 
@@ -196,7 +213,7 @@ export default function ProductCard({ product = {} }: ProductCardProps) {
                 onClick={handleIncrease}
                 disabled={quantity >= product.stock}
                 className="w-8 h-8 sm:w-7 sm:h-7 md:w-8 md:h-8 rounded border border-gray-300 bg-white
-                         flex items-center justify-center font-semibold
+                         flex items-center justify-center font-normal cursor-pointer
                          disabled:opacity-50 disabled:cursor-not-allowed
                          hover:bg-gray-50 active:bg-gray-100"
               >
@@ -211,11 +228,11 @@ export default function ProductCard({ product = {} }: ProductCardProps) {
           <button
             onClick={handleAddToCart}
             disabled={product.stock <= 0}
-            className="w-full bg-emerald-500 text-white rounded-lg font-medium
+            className="w-full bg-[#E41F26] text-white font-normal text-sm rounded-lg cursor-pointer
                      flex items-center justify-center gap-2
                      hover:bg-emerald-600 transition-colors active:scale-95
                      disabled:opacity-50 disabled:cursor-not-allowed
-                     py-2.5 sm:py-2 md:py-2.5"
+                     py-2.5 sm:py-2 md:py-1.5"
           >
             <FontAwesomeIcon icon={faCartPlus} className="text-sm" />
             <span className="sm:hidden">Add to Cart</span>
@@ -228,11 +245,13 @@ export default function ProductCard({ product = {} }: ProductCardProps) {
 
       {/* Image Zoom Modal - Responsive */}
       {showZoom && (
-        <div className="fixed inset-0 bg-black/90 z-50 flex items-center justify-center p-2 sm:p-4">
+        <div className='fixed w-[60%] h-[80%] m-auto z-50 inset-0'>
+          
+        <div className="inset-0 relative z-50 bg-white flex items-center justify-center p-2 sm:p-4 rounded-md">
           {/* Close button */}
           <button
             onClick={closeZoom}
-            className="absolute top-3 sm:top-4 right-3 sm:right-4 text-white text-xl sm:text-2xl z-10
+            className="absolute top-3 sm:top-4 right-3 sm:right-4 text-black/60 text-xl sm:text-2xl z-10
                      hover:text-emerald-400 transition-colors p-2"
             aria-label="Close zoom"
           >
@@ -244,8 +263,8 @@ export default function ProductCard({ product = {} }: ProductCardProps) {
             <>
               <button
                 onClick={prevImage}
-                className="absolute left-2 sm:left-4 top-1/2 -translate-y-1/2
-                         text-white text-xl sm:text-2xl p-2 sm:p-3 
+                className="absolute z-50 left-2 sm:left-4 top-1/2 -translate-y-1/2
+                         text-black/60 text-xl sm:text-2xl p-2 sm:p-3 
                          hover:text-emerald-400 transition-colors"
                 aria-label="Previous image"
               >
@@ -253,8 +272,8 @@ export default function ProductCard({ product = {} }: ProductCardProps) {
               </button>
               <button
                 onClick={nextImage}
-                className="absolute right-2 sm:right-4 top-1/2 -translate-y-1/2
-                         text-white text-xl sm:text-2xl p-2 sm:p-3
+                className="absolute z-50 right-2 sm:right-4 top-1/2 -translate-y-1/2
+                         text-black/60 text-xl sm:text-2xl p-2 sm:p-3
                          hover:text-emerald-400 transition-colors"
                 aria-label="Next image"
               >
@@ -277,7 +296,7 @@ export default function ProductCard({ product = {} }: ProductCardProps) {
 
           {/* Thumbnail strip */}
           {allImages.length > 1 && (
-            <div className="absolute bottom-2 sm:bottom-4 left-0 right-0 px-2">
+            <div className="absolute z-50 bottom-2 sm:bottom-4 left-0 right-0 px-2">
               <div className="flex justify-center gap-1 sm:gap-2 overflow-x-auto py-2">
                 {allImages.map((img, index) => (
                   <button
@@ -309,6 +328,8 @@ export default function ProductCard({ product = {} }: ProductCardProps) {
                         px-2 sm:px-3 py-1 rounded-full text-xs sm:text-sm">
             {selectedImageIndex + 1} / {allImages.length}
           </div>
+        </div>
+        <div className='fixed inset-0 bg-black/90 opacity-15'></div>
         </div>
       )}
     </>
