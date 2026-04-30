@@ -1,7 +1,7 @@
 // const API_URL = 'http://localhost:4000';
 //const API_URL = 'https://api.gobuyly.com';
-// const API_URL = 'https://gobuyly-api.vercel.app';
-const API_URL = 'https://gobuyly-api-pradeepbawari25-gmailcoms-projects.vercel.app';
+ const API_URL = 'https://gobuyly-api.vercel.app';
+//const API_URL = 'https://gobuyly-api-pradeepbawari25-gmailcoms-projects.vercel.app';
 // Fetch all categories
 export async function getCategories() {
   try {
