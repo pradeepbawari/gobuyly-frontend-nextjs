@@ -106,7 +106,7 @@ const Orders = () => {
                       {item.variantOrder?.displayTitle}
                     </p>
                     <p className="text-gray-500">
-                      {item.variantOrder.size}
+                      {item.variantOrder?.size}
                     </p>
 
                     <div className="flex flex-wrap gap-4 mt-1 text-gray-600">

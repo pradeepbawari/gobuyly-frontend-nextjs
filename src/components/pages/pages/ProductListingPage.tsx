@@ -86,7 +86,7 @@ export default function ProductListingPage({
         } else {
           response = await getProducts({
             filters: {
-              category_id: categoryId,
+              subcategory_id: categoryId,
             },
             page,
             limit,
@@ -179,7 +179,7 @@ export default function ProductListingPage({
             </p>
           </div>
         )}
-
+        
         <SearchFilter
           onSearch={handleSearch}
           initialBrand=""
@@ -203,7 +203,7 @@ export default function ProductListingPage({
           </div>
         )}
 
-        <div className="relative min-h-[300px] sm:min-h-[400px]">
+        <div className="relative min-h-[300px] sm:min-h-[400px] bg-white">
           {loading && <ProductPanelLoader />}
 
           {!loading && products.length === 0 ? (

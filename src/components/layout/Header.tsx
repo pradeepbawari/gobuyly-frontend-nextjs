@@ -21,19 +21,23 @@ export default function Header() {
   }
 
   return (
-    <header className="w-full bg-white shadow-sm sticky top-0 z-50">
+    <>
+    <div className="w-full bg-[#E41F26] shadow-sm sticky top-0 z-50 text-white p-2 text-center text-sm">
+      Free Shipping over ₹3000
+    </div>
+      <header className="w-full bg-white shadow-sm sticky top-0 z-50">
       {/* Main header */}
-      <div className="px-4 sm:px-6 py-3">
+      <div className="px-4 sm:px-6 py-5">
         <div className="flex items-center justify-between">
           {/* Logo */}
-          <div className="flex items-center gap-2">
-            <Link href="/" className="text-lg text-gray-800 font-semibold" onClick={closeMenu}>
+          <div className="flex items-center ₹">
+            <Link href="/" className="text-[22px] text-gray-800 font-normal" onClick={closeMenu}>
               GoBuyly
             </Link>
           </div>
 
           {/* Desktop Navigation */}
-          <nav className="hidden md:flex gap-8 font-normal text-gray-700">
+          <nav className="hidden md:flex gap-8 font-normal text-[rgb(51, 51, 51)]">
             <Link href="/" className="hover:text-emerald-600 transition-colors flex items-center gap-1">
               Home
             </Link>
@@ -179,5 +183,6 @@ export default function Header() {
         </div>
       )}
     </header>
+    </>
   )
 }

@@ -72,7 +72,7 @@ function SubcategoryItem({
     <div className="w-full">
       <div
         onClick={handleClick}
-        className="p-2.5 pl-3 hover:bg-emerald-50 cursor-pointer flex items-center justify-between rounded-lg transition-colors"
+        className="p-2 pl-3 hover:bg-emerald-50 cursor-pointer flex items-center justify-between rounded-lg transition-colors"
         style={{ 
           marginLeft: isMobile ? 0 : level * 16,
           paddingLeft: isMobile ? '1rem' : `${level * 16 + 12}px`
@@ -83,7 +83,7 @@ function SubcategoryItem({
             icon={faCircle} 
             className="text-emerald-500 text-[10px] flex-shrink-0" 
           />
-          <span className={`${isMobile ? 'text-base' : 'text-sm'} text-gray-700 font-medium`}>
+          <span className={`${isMobile ? 'text-base' : 'text-[1rem]'} text-gray-700 font-normal`}>
             {subcategory.name}
           </span>
         </div>
@@ -150,16 +150,16 @@ export default function CategoryMenu({
   return (
     <>
       {/* Desktop Menu */}
-      <div className="hidden lg:block w-full h-full bg-white border-r border-gray-200">
+      <div className="hidden lg:block w-full h-full border-r border-gray-200">
         <div className="sticky top-0 max-h-screen overflow-y-auto py-6">
-          <div className="px-6 pb-4 border-b border-gray-200">
-            <h3 className="font-bold text-lg text-gray-800 mb-0 flex items-center gap-2.5">
+          <div className="px-0 pb-4 border-b border-gray-200">
+            <h3 className="font-bold text-[1rem] text-gray-800 mb-0 flex items-center gap-2.5">
               <FontAwesomeIcon icon={faListUl} className="text-emerald-600" />
               All Categories
             </h3>
           </div>
 
-          <div className="px-4 py-2">
+          <div className="px-0 py-2">
             {categories.map((category) => (
               <div key={category.id} className="mb-1">
                 <div 
